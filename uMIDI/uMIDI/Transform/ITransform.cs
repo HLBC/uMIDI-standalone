@@ -1,4 +1,4 @@
-using uMidi.Common;
+using uMidi;
 
 namespace uMidi.Transform
 {

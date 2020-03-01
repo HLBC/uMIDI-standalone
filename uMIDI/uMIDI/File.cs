@@ -1,6 +1,6 @@
-namespace uMidi.Common
+namespace uMidi
 {
-    // Decodes given midi data into uMidi structure
+    // Decodes given midi data into uMidi structure.
     public class File
     {
         private byte[] midi; // placeholder
