@@ -1,5 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uMIDI", "uMIDI\uMIDI.csproj", "{42C8CEA1-A315-45C9-8314-16DE3DA76EA1}"
 EndProject
 Global
