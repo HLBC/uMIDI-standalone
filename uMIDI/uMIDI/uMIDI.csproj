@@ -4,4 +4,12 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="src\" />
+      <Folder Include="src\Common\" />
+      <Folder Include="src\IO\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include=".gitignore" />
+    </ItemGroup>
 </Project>
