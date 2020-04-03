@@ -10,7 +10,7 @@ namespace uMIDI.Common
 
     public interface IMessage
     {
-        public MidiMessage Message { get; }
+        MidiMessage Message { get; }
     }
 
     public class NoteOffMessage : IMessage

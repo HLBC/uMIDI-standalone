@@ -8,6 +8,7 @@ namespace uMIDI.Common
         public byte MetaType;
         public byte DataLength;
         public byte[] Data;
+        public long Time;
     }
 
     public abstract class IMetaMessage : IMessage
@@ -81,8 +82,13 @@ namespace uMIDI.Common
                 if (!(new List<int>() { 2, 4, 8, 16, 32 }).Contains(value))
                     throw new ArgumentException(
                         "Illegal time signature denominator");
-                Subdivision = (byte)Math.Log2(value);
+                Subdivision = (byte) Log2(value);
             }
+        }
+
+        double Log2(double n)
+        {
+            return Math.Log(n) / Math.Log(2);
         }
 
         public TimeSignatureMetaMessage(int numerator, int denominator, long time)
