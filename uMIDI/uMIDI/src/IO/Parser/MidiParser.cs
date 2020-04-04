@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using uMIDI_decoder.Utility;
 using uMIDI_decoder.Models;
 
 namespace uMIDI_decoder
@@ -157,14 +158,14 @@ namespace uMIDI_decoder
 
             while (!endOfTrack)
             {
-                IDictionary<String, int> deltaTimeDictionary = FindDeltaTime(trackChunk);
-                trackChunk = trackChunk.GetRange(deltaTimeDictionary["timeBytes"], trackChunk.Count() - deltaTimeDictionary["timeBytes"]);
+                VariableChunkSize<int> timeChunk = FindDeltaTime(trackChunk);
+                trackChunk = trackChunk.GetRange(timeChunk.chunkSize, trackChunk.Count() - timeChunk.chunkSize);
 
                 int currentEventSize = 0;
                 String nextByte = trackChunk.First();
                 if (nextByte == "FF")
                 {
-                    TrackMetaEventInfo metaEventInfo = ProcessMetaEvent(trackChunk, deltaTimeDictionary["deltaTime"]);
+                    TrackMetaEventInfo metaEventInfo = ProcessMetaEvent(trackChunk, timeChunk.data);
                     currentEventSize = metaEventInfo.eventSize;
                     decodedEventList.Add(metaEventInfo.trackOrMetaEvent);
                     if (trackChunk[1] == "2F")
@@ -174,7 +175,7 @@ namespace uMIDI_decoder
                 }
                 else
                 {
-                    TrackMetaEventInfo trackEventInfo = ProcessTrackEvent(trackChunk, deltaTimeDictionary["deltaTime"]);
+                    TrackMetaEventInfo trackEventInfo = ProcessTrackEvent(trackChunk, timeChunk.data);
                     currentEventSize = trackEventInfo.eventSize;
                     decodedEventList.Add(trackEventInfo.trackOrMetaEvent);
                 }
@@ -187,13 +188,40 @@ namespace uMIDI_decoder
 
         ///
         //TODO!!!
-        private IDictionary<String, int> FindDeltaTime(List<String> trackChunk)
+        private VariableChunkSize<int> FindDeltaTime(List<string> trackChunk)
         {
-            IDictionary<String, int> deltaTimeDictionary = new Dictionary<String, int>();
+            VariableChunkSize<int> timeChunk;
+            timeChunk.chunkSize = 1;
+            timeChunk.data = 0;
             // take next few bytes, convert to binary, figure out where it ends, convert to decimal, return
             // Create dictionary: "deltaTime" -> ..., "timeBytes" -> ...
 
-            return deltaTimeDictionary;
+            return timeChunk;
+        }
+
+        private static VariableChunkSize<int> FindDeltaTime(List<byte> trackChunk)
+        {
+            VariableChunkSize<int> timeChunk;
+            timeChunk.chunkSize = 1;
+            timeChunk.data = 0;
+
+            while (true)
+            {
+                byte next = trackChunk[timeChunk.chunkSize - 1];
+                timeChunk.data = (int)BitByBit.ConcatIgnoreFront(timeChunk.data, next, 1);
+
+                if (!BitByBit.IsFrontBitsOn(next, 1))
+                    break;
+                timeChunk.chunkSize++;
+            }
+
+            return timeChunk;
+        }
+
+        private struct VariableChunkSize<T>
+        {
+            internal int chunkSize;
+            internal T data;
         }
 
         /// <summary>
