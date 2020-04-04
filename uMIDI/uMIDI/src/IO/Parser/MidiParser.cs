@@ -15,13 +15,34 @@ namespace uMIDI_decoder
         private static readonly IDictionary<int, String> formatMap = new Dictionary<int, String> { { 0, "single track file format" }, { 1, "multiple track file format" }, { 2, "multiple song file format" } };
         private static readonly IDictionary<String, int> headerPartsIndexMap = new Dictionary<String, int> { { "format", 0 }, { "numberOfTracks", 2 }, { "unitForDeltaTiming", 4 } };
         private static readonly IDictionary<String, int> headerPartsSizeMap = new Dictionary<String, int> { { "format", 2 }, { "numberOfTracks", 2 }, { "unitForDeltaTiming", 2 } };
-        private static readonly IDictionary<String, String> metaEventCodeDictionary = new Dictionary<String, String> { { "00", "sequence number" }, { "01", "text event" }, { "02", "copyright notice" }, { "03", "sequence or track name" }, { "04", "instrument name" }, { "05", "lyric text" }, { "06", "marker text" }, { "07", "cue point" }, { "20", "MIDI channel prefix assignment" }, { "2F", "end of track" }, { "51", "tempo setting" }, { "54", "SMPTE offset" }, { "58", "time signature" }, { "59", "key signature" }, { "7F", "sequencer specific event" } };
+        private static readonly IDictionary<byte, string> metaEventCodeDictionary = new Dictionary<byte, string> { { 0x00, "sequence number" }, { 0x01, "text event" }, { 0x02, "copyright notice" }, { 0x03, "sequence or track name" }, { 0x04, "instrument name" }, { 0x05, "lyric text" }, { 0x06, "marker text" }, { 0x07, "cue point" }, { 0x20, "MIDI channel prefix assignment" }, { 0x2F, "end of track" }, { 0x51, "tempo setting" }, { 0x54, "SMPTE offset" }, { 0x58, "time signature" }, { 0x59, "key signature" }, { 0x7F, "sequencer specific event" } };
         private static readonly IDictionary<String, String> trackEventStatusDictionary = new Dictionary<String, String> { { "8", "note off" }, { "9", "note on" } };
         private const int chunkBodyLengthSize = 4;
 
         #endregion
 
         #region --Functions--
+
+
+        #region Temporary fix to using strings over bytes
+        private static List<byte> Strings2Bytes(List<string> strings)
+        {
+            CheckSizes(strings, 2);
+
+            List<byte> bytes = new List<byte>(strings.Count);
+
+            foreach (string s in strings) bytes.Add(HexByte.Paired(s[0], s[1]).Value());
+
+            return bytes;
+        }
+
+        private static void CheckSizes(List<string> strings, int numOfChars)
+        {
+            foreach (string s in strings)
+                if (s.Length < numOfChars)
+                    throw new ArgumentException("Not all strings are at least " + numOfChars + " long. (" + s + ")");
+        }
+        #endregion
 
         public List<Event> DecodeMidi(List<String> midiFile)
         {
@@ -151,8 +172,9 @@ namespace uMIDI_decoder
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <returns>A <see cref="List"/> of <see cref="Event"/>s that represent the information from the track chunk.</returns>
-        private List<Event> ProcessTrackChunk(List<String> trackChunk)
+        private List<Event> ProcessTrackChunk(List<String> trackChun)
         {
+            List<byte> trackChunk = Strings2Bytes(trackChun);
             List<Event> decodedEventList = new List<Event>();
             bool endOfTrack = false;
 
@@ -162,13 +184,13 @@ namespace uMIDI_decoder
                 trackChunk = trackChunk.GetRange(timeChunk.chunkSize, trackChunk.Count() - timeChunk.chunkSize);
 
                 int currentEventSize = 0;
-                String nextByte = trackChunk.First();
-                if (nextByte == "FF")
+                byte nextByte = trackChunk.First();
+                if (nextByte == 0xFF)
                 {
                     TrackMetaEventInfo metaEventInfo = ProcessMetaEvent(trackChunk, timeChunk.data);
                     currentEventSize = metaEventInfo.eventSize;
                     decodedEventList.Add(metaEventInfo.trackOrMetaEvent);
-                    if (trackChunk[1] == "2F")
+                    if (trackChunk[1] == 0x2F)
                     {
                         endOfTrack = true;
                     }
@@ -186,19 +208,12 @@ namespace uMIDI_decoder
             return decodedEventList;
         }
 
-        ///
-        //TODO!!!
-        private VariableChunkSize<int> FindDeltaTime(List<string> trackChunk)
-        {
-            VariableChunkSize<int> timeChunk;
-            timeChunk.chunkSize = 1;
-            timeChunk.data = 0;
-            // take next few bytes, convert to binary, figure out where it ends, convert to decimal, return
-            // Create dictionary: "deltaTime" -> ..., "timeBytes" -> ...
-
-            return timeChunk;
-        }
-
+        /*
+         * Dynamically finds the variable-sized time chunk and aggregates their
+         * values.
+         * Note: the back 7-bits of each byte correspond to the value, while the
+         *       first bit notifies if there is another byte to follow.
+         */
         private static VariableChunkSize<int> FindDeltaTime(List<byte> trackChunk)
         {
             VariableChunkSize<int> timeChunk;
@@ -230,12 +245,13 @@ namespace uMIDI_decoder
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <param name="deltaTime">The time between the previous event and the current event.</param>
         /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="Event"/> information and the number of bytes the meta event was.</returns>
-        private TrackMetaEventInfo ProcessMetaEvent(List<String> trackChunk, int deltaTime)
+        private TrackMetaEventInfo ProcessMetaEvent(List<byte> trackChunk, int deltaTime)
         {
-            int eventSize = Convert.ToInt32(trackChunk[2], 16);
+            int eventSize = trackChunk[2];
             MetaEvent metaEvent = new MetaEvent
             {
                 EventType = metaEventCodeDictionary[trackChunk[1]],
+                // TODO: EventText is leftover from trackChunk being a list of strings. Don't know what to do yet.
                 EventText = string.Join("", trackChunk.GetRange(3, eventSize)),
                 DeltaTime = deltaTime
             };
@@ -254,7 +270,7 @@ namespace uMIDI_decoder
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <param name="deltaTime">The time between the previous event and the current event.</param>
         /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="Event"/> information and the number of bytes the meta event was.</returns>
-        private TrackMetaEventInfo ProcessTrackEvent(List<String> trackChunk, int deltaTime)
+        private TrackMetaEventInfo ProcessTrackEvent(List<byte> trackChunk, int deltaTime)
         {
             String trackEventType = trackEventStatusDictionary[trackChunk[0].ToString()];
             
@@ -262,9 +278,10 @@ namespace uMIDI_decoder
             {
                 DeltaTime = deltaTime,
                 EventType = trackEventType,
-                NoteCode = Convert.ToInt32(trackChunk[1], 16),
-                NoteVelocity = Convert.ToInt32(trackChunk[2], 16),
-                Channel = Convert.ToInt32(trackChunk[0][1].ToString(), 16)
+                NoteCode = trackChunk[1],
+                NoteVelocity = trackChunk[2],
+                // TODO: Should channel still be a string? probably not right?
+                Channel = BitByBit.Nib2Hex(BitByBit.RightNib(trackChunk[0]))
             };
 
             return new TrackMetaEventInfo

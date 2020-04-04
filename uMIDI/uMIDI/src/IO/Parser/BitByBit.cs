@@ -5,6 +5,35 @@ namespace uMIDI_decoder.Utility
     {
         private BitByBit() { }
 
+        public static byte LeftNib(byte b)
+        {
+            return (byte)(b >> 4);
+        }
+
+        public static byte RightNib(byte b)
+        {
+            return (byte)(b & 0x0F);
+        }
+
+        // Converts a 4-bit nibble to a hexidecimal character (0->F)
+        // ex: 00000100 -> '4'
+        // ex: 01001111 -> 'F'
+        public static char Nib2Hex(byte b)
+        {
+            b = (byte)(0x0F & b);
+            if (Between(b, 0, 9))
+                return (char)('0' + b);
+            else if (Between(b, 10, 15))
+                return (char)('A' + b - 10);
+            else
+                return '0';
+        }
+
+        private static bool Between(int i, int low, int high)
+        {
+            return low <= i && i <= high;
+        }
+
         public static bool IsFrontBitsOn(byte b, int numOfBits)
         {
             if (0 < numOfBits && numOfBits <= 8)
