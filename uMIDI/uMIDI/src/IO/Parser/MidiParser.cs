@@ -10,8 +10,8 @@ namespace uMIDI_decoder
     {
         #region --Constants--
 
-        private static readonly List<String> headerChunk = new List<String> { "4d", "54", "68", "64" };
-        private static readonly List<String> trackChunk = new List<String> { "4d", "54", "72", "6b" };
+        private static readonly List<byte> HEADER_CHUNK = new List<byte> { 0x4d, 0x54, 0x68, 0x64 };
+        private static readonly List<byte> TRACK_CHUNK  = new List<byte> { 0x4d, 0x54, 0x72, 0x6b };
         private static readonly IDictionary<int, String> formatMap = new Dictionary<int, String> { { 0, "single track file format" }, { 1, "multiple track file format" }, { 2, "multiple song file format" } };
         private static readonly IDictionary<String, int> headerPartsIndexMap = new Dictionary<String, int> { { "format", 0 }, { "numberOfTracks", 2 }, { "unitForDeltaTiming", 4 } };
         private static readonly IDictionary<String, int> headerPartsSizeMap = new Dictionary<String, int> { { "format", 2 }, { "numberOfTracks", 2 }, { "unitForDeltaTiming", 2 } };
@@ -57,14 +57,14 @@ namespace uMIDI_decoder
             if (IsHeaderChunk(midiFile.GetRange(0, 4)))
             {
                 int bodySize = FindChunkBodyLength(midiFile.GetRange(4, 4));
-                chunkSize = bodySize + headerChunk.Count() + chunkBodyLengthSize;
-                decodedEventList.Add(ProcessHeaderChunk(midiFile.GetRange(headerChunk.Count() + chunkBodyLengthSize, bodySize)));
+                chunkSize = bodySize + HEADER_CHUNK.Count() + chunkBodyLengthSize;
+                decodedEventList.Add(ProcessHeaderChunk(midiFile.GetRange(HEADER_CHUNK.Count() + chunkBodyLengthSize, bodySize)));
             }
             else if (IsTrackChunk(midiFile.GetRange(0, 4)))
             {
                 int bodySize = FindChunkBodyLength(midiFile.GetRange(4, 4));
-                chunkSize = bodySize + trackChunk.Count() + chunkBodyLengthSize;
-                decodedEventList = decodedEventList.Concat(ProcessTrackChunk(midiFile.GetRange(trackChunk.Count() + chunkBodyLengthSize, bodySize))).ToList();
+                chunkSize = bodySize + TRACK_CHUNK.Count() + chunkBodyLengthSize;
+                decodedEventList = decodedEventList.Concat(ProcessTrackChunk(midiFile.GetRange(TRACK_CHUNK.Count() + chunkBodyLengthSize, bodySize))).ToList();
             }
             
             if (midiFile.Count() > chunkSize) {
@@ -81,15 +81,11 @@ namespace uMIDI_decoder
         /// </summary>
         /// <param name="chunkSize">A <see cref="List{T}"/> of four hexadecimal bytes.</param>
         /// <returns>Length of the chunk's body's length.</returns>
-        private int FindChunkBodyLength(List<String> chunkSize)
+        private int FindChunkBodyLength(List<string> bodySizeChun)
         {
             // receive 4 bytes of hexadecimal and turn into decimal to figure out how big the header chunk is then return this
-            int size =
-                Convert.ToInt32(chunkSize[0], 16) * 16777216 +
-                Convert.ToInt32(chunkSize[1], 16) * 65536 +
-                Convert.ToInt32(chunkSize[2], 16) * 256 +
-                Convert.ToInt32(chunkSize[3], 16);
-            return size;
+            List<byte> bodySizeChunk = Strings2Bytes(bodySizeChun);
+            return ConcatBytes(bodySizeChunk);
         }
 
         /// <summary>
@@ -97,9 +93,10 @@ namespace uMIDI_decoder
         /// </summary>
         /// <param name="chunkIdentifier">A <see cref="List{T}"/> of four hexadecimal bytes.</param>
         /// <returns>true if header chunk; else false.</returns>
-        private bool IsHeaderChunk(List<String> chunkIdentifier)
+        private bool IsHeaderChunk(List<string> chunkIdentifie)
         {
-            return chunkIdentifier.SequenceEqual(headerChunk);
+            List<byte> chunkIdentifier = Strings2Bytes(chunkIdentifie);
+            return chunkIdentifier.SequenceEqual(HEADER_CHUNK);
         }
 
         /// <summary>
@@ -142,9 +139,10 @@ namespace uMIDI_decoder
         /// </summary>
         /// <param name="numberOfTracksInfo">A <see cref="List{T}"/> of two hexadecimal bytes.</param>
         /// <returns>The number of tracks related to this header.</returns>
-        private int FindNumberOfTracks(List<String> numberOfTracksInfo)
+        private int FindNumberOfTracks(List<string> numberOfTracksInf)
         {
-            return Convert.ToInt32(numberOfTracksInfo[0], 16) * 256 + Convert.ToInt32(numberOfTracksInfo[1], 16);
+            List<byte> numberOfTracksInfo = Strings2Bytes(numberOfTracksInf);
+            return ConcatBytes(numberOfTracksInfo);
         }
 
         /// <summary>
@@ -152,9 +150,17 @@ namespace uMIDI_decoder
         /// </summary>
         /// <param name="unitForDeltaTimingInfo">A <see cref="List{T}"/> of two hexadecimal bytes.</param>
         /// <returns>The unit for delta timing</returns>
-        private int FindUnitForDeltaTiming(List<String> unitForDeltaTimingInfo)
+        private int FindUnitForDeltaTiming(List<string> unitForDeltaTimingInf)
         {
-            return Convert.ToInt32(unitForDeltaTimingInfo[0], 16) * 256 + Convert.ToInt32(unitForDeltaTimingInfo[1], 16);
+            List<byte> unitForDeltaTimingInfo = Strings2Bytes(unitForDeltaTimingInf);
+            return ConcatBytes(unitForDeltaTimingInfo);
+        }
+
+        private int ConcatBytes(List<byte> bytes)
+        {
+            long concat = 0;
+            foreach (byte b in bytes) concat = BitByBit.Concat(concat, b);
+            return (int)concat;
         }
 
         /// <summary>
@@ -162,9 +168,10 @@ namespace uMIDI_decoder
         /// </summary>
         /// <param name="chunkIdentifier">A <see cref="List{T}"/> of four hexadecimal bytes.</param>
         /// <returns>true if track chunk; else false.</returns>
-        private bool IsTrackChunk(List<String> chunkIdentifier)
+        private bool IsTrackChunk(List<string> chunkIdentifie)
         {
-            return chunkIdentifier.SequenceEqual(trackChunk);
+            List<byte> chunkIdentifier = Strings2Bytes(chunkIdentifie);
+            return chunkIdentifier.SequenceEqual(TRACK_CHUNK);
         }
 
         /// <summary>
@@ -172,7 +179,7 @@ namespace uMIDI_decoder
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <returns>A <see cref="List"/> of <see cref="Event"/>s that represent the information from the track chunk.</returns>
-        private List<Event> ProcessTrackChunk(List<String> trackChun)
+        private List<Event> ProcessTrackChunk(List<string> trackChun)
         {
             List<byte> trackChunk = Strings2Bytes(trackChun);
             List<Event> decodedEventList = new List<Event>();

@@ -42,9 +42,14 @@ namespace uMIDI_decoder.Utility
                 return false;
         }
 
+        public static long Concat(long num, byte toConcat)
+        {
+            return ConcatIgnoreFront(num, toConcat, 0);
+        }
+
         public static long ConcatIgnoreFront(long num, byte toConcat, int numOfBits)
         {
-            if (0 < numOfBits && numOfBits <= 8)
+            if (0 <= numOfBits && numOfBits < 8)
                 return (num << (8 - numOfBits)) + ClearFront(toConcat, numOfBits);
             else if (8 == numOfBits)
                 return num;
