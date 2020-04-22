@@ -6,24 +6,29 @@ namespace uMIDI.Common
     public struct MetaMessage
     {
         public byte MetaType;
-        public byte DataLength;
         public byte[] Data;
     }
 
     public abstract class IMetaMessage : IMessage
     {
         public MetaMessage MetaMessage { get; }
+        public abstract long TimeDelta { get; }
 
         public MidiMessage Message
         {
             get
             {
+                // Length of data array, plus one byte for the type code, and
+                // one byte for the length
+                byte[] data = new byte[MetaMessage.Data.Length + 2];
+                data[0] = MetaMessage.MetaType;
+                data[1] = (byte) MetaMessage.Data.Length;
+                MetaMessage.Data.CopyTo(data, 2);
                 return new MidiMessage
                 {
                     Status = 0xff,
-                    MsgSize = 0, // TODO
-                    Data = new byte[0], // TODO
-                    TimeDelta = 0
+                    Data = data,
+                    TimeDelta = TimeDelta
                 };
             }
         }
@@ -34,15 +39,15 @@ namespace uMIDI.Common
         // Tempo in *quarter notes* per minute
         public double Tempo { get; set; }
 
-        public long Time { get; set; }
+        public override long TimeDelta { get; }
 
-        public TempoMetaMessage(double tempo, long time)
+        public TempoMetaMessage(double tempo, long timeDelta)
         {
             // Minimum tempo is 0xffffff microseconds per beat (~3.6 BPM)
             if (tempo < 1 / ((double)(0xffffff) / 1e6 / 60))
                 throw new ArgumentException("Tempo is too slow");
             Tempo = tempo;
-            Time = time;
+            TimeDelta = timeDelta;
         }
 
         public MetaMessage MetaMessage
@@ -57,9 +62,7 @@ namespace uMIDI.Common
                 return new MetaMessage
                 {
                     MetaType = 0x51,
-                    DataLength = 3,
-                    Data = new byte[] { data1, data2, data3 },
-                    Time = Time
+                    Data = new byte[] { data1, data2, data3 }
                 };
             }
         }
@@ -68,7 +71,7 @@ namespace uMIDI.Common
     public class TimeSignatureMetaMessage : IMetaMessage
     {
 
-        public long Time { get; set; }
+        public override long TimeDelta { get; }
 
 
         public byte BeatsPerMeasure { get; set; }
@@ -85,11 +88,12 @@ namespace uMIDI.Common
             }
         }
 
-        public TimeSignatureMetaMessage(int numerator, int denominator, long time)
+        public TimeSignatureMetaMessage(int numerator, int denominator,
+            long timeDelta)
         {
             BeatsPerMeasure = (byte)numerator;
             Subdivision = (byte)denominator;
-            Time = time;
+            TimeDelta = timeDelta;
         }
 
         public MetaMessage MetaMessage
@@ -100,10 +104,8 @@ namespace uMIDI.Common
                 return new MetaMessage
                 {
                     MetaType = 0x58,
-                    DataLength = 4,
                     Data = new byte[] { BeatsPerMeasure, Subdivision,
-                        metronomeClick, 8 },
-                    Time = Time
+                        metronomeClick, 8 }
                 };
             }
         }
@@ -111,7 +113,7 @@ namespace uMIDI.Common
 
     public class KeySignatureMetaMessage : IMetaMessage
     {
-        public long Time { get; set; }
+        public override long TimeDelta { get; }
 
         private sbyte sharpsFlats;
         private byte majorMinor;
@@ -205,11 +207,12 @@ namespace uMIDI.Common
             }
         }
 
-        public KeySignatureMetaMessage(sbyte sharpsFlats, byte majorMinor, long time)
+        public KeySignatureMetaMessage(sbyte sharpsFlats, byte majorMinor,
+            long timeDelta)
         {
             sharpsFlats = sharpsFlats;
             majorMinor = majorMinor;
-            Time = time;
+            TimeDelta = timeDelta;
         }
 
         public MetaMessage MetaMessage
@@ -219,9 +222,7 @@ namespace uMIDI.Common
                 return new MetaMessage
                 {
                     MetaType = 0x59,
-                    DataLength = 2,
-                    Data = new byte[] { (byte)sharpsFlats, majorMinor },
-                    Time = Time
+                    Data = new byte[] { (byte)sharpsFlats, majorMinor }
                 };
             }
         }

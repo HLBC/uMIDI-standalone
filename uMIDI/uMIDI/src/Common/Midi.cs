@@ -1,11 +1,21 @@
+using System.Linq;
+
 namespace uMIDI.Common
 {
     public struct MidiMessage
     {
         public byte Status;
-        public byte MsgSize;
         public byte[] Data;
         public long TimeDelta;
+
+        public byte[] ToBytes()
+        {
+            // TODO return TimeDelta as well?
+            byte[] arr = new byte[Data.Length + 1];
+            arr[0] = Status;
+            Data.CopyTo(arr, 1);
+            return arr;
+        }
     }
 
     public interface IMessage
@@ -34,7 +44,6 @@ namespace uMIDI.Common
                 return new MidiMessage
                 {
                     Status = (byte)(0x80 + Note.Channel),
-                    MsgSize = 2,
                     Data = new byte[] { Note.Pitch, Note.Velocity },
                     TimeDelta = TimeDelta
                 };
@@ -61,7 +70,6 @@ namespace uMIDI.Common
                 return new MidiMessage
                 {
                     Status = (byte)(0x90 + Note.Channel),
-                    MsgSize = 2,
                     Data = new byte[] { Note.Pitch, Note.Velocity },
                     TimeDelta = TimeDelta
                 };
@@ -85,7 +93,6 @@ namespace uMIDI.Common
                 return new MidiMessage
                 {
                     Status = 0xf8,
-                    MsgSize = 0,
                     Data = new byte[0],
                     TimeDelta = TimeDelta
                 };
