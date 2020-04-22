@@ -23,7 +23,7 @@ namespace uMIDI.Common
                     Status = 0xff,
                     MsgSize = 0, // TODO
                     Data = new byte[0], // TODO
-                    Time = 0
+                    TimeDelta = 0
                 };
             }
         }

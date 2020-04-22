@@ -16,13 +16,19 @@ namespace uMIDI.IO
 
         public void AddInstrument(IMidiInstrument instrument)
         {
-            //TODO
+            // TODO
         }
 
         // Formerly SendToStream()
         public void Push(IMessage message)
         {
-            //TODO
+            // TODO
+        }
+
+        public double MillisecondsPerTick()
+        {
+            // TODO
+            return 0;
         }
     }
 }
