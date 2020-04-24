@@ -10,16 +10,25 @@ namespace uMIDI.src
         public MetaMidiStream MetaStream { get; }
         public int BufferSize { get; }
         public bool EndOfFile { get; }
-        private LinkedList<IMessage> messages;
+        private List<IMessage> messages;
         private int playHead;
 
-        public MidiFile(int bufferSize)
+        public MidiFile(MetaMidiStream stream, List<IMessage> messages,
+            int bufferSize)
         {
-            MetaStream = new MetaMidiStream();
+            MetaStream = stream;
             BufferSize = bufferSize;
             EndOfFile = false;
-            messages = new LinkedList<IMessage>();
+            this.messages = messages;
             playHead = 0;
+        }
+
+        public MidiFile(int bufferSize, int beatsPerMeasure, int subdivision,
+            int bpm, List<IMessage> messages) : this(
+                new MetaMidiStream(beatsPerMeasure, subdivision, bpm),
+                messages, bufferSize)
+        {
+
         }
 
         public void PushNextBuffer()

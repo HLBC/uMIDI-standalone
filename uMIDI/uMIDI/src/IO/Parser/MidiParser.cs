@@ -264,6 +264,19 @@ namespace uMIDI_decoder
             IMessage metaEvent = null;                                  //TODO: need to find a better way to handle this
             String eventType = metaEventCodeDictionary[trackChunk[1]];
 
+            byte[] data = new byte[eventSize];
+            for (int i = 0; i < eventSize; i++)
+            {
+                data[i] = trackChunk[2 + i];
+            }
+            MetaMessage message = new MetaMessage
+            {
+                MetaType = trackChunk[1],
+                Data = data
+            }
+            IMetaMessage metaMessage = IMetaMessage.ToIMetaMessage(message,
+                deltaTime);
+            /*
             switch (eventType)
             {
                 case "tempo setting":
@@ -275,6 +288,7 @@ namespace uMIDI_decoder
                     break;
                 // TODO: Add all the meta message cases
             }
+            */
 
             return new TrackMetaEventInfo
             {
