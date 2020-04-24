@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace uMIDI.Common
 {
+    public enum MetaType
+    {
+        TEMPO = 0x51,
+        TIME_SIGNATURE = 0x58,
+        KEY_SIGNATURE = 0x59
+    }
+
     public struct MetaMessage
     {
         public byte MetaType;
@@ -30,6 +37,41 @@ namespace uMIDI.Common
                     Data = data,
                     TimeDelta = TimeDelta
                 };
+            }
+        }
+
+        public static IMetaMessage ToIMetaMessage(MetaMessage msg,
+            long timeDelta)
+        {
+            switch (msg.MetaType)
+            {
+                case (byte)MetaType.TEMPO:
+                    byte data1 = msg.Data[0];
+                    byte data2 = msg.Data[1];
+                    byte data3 = msg.Data[2];
+                    int microsecondsPerBeat = data1 * 0x10000 + data2 * 0x100 +
+                        data3;
+                    double tempo = 60 * 1e6 / (double)microsecondsPerBeat;
+                    return new TempoMetaMessage(
+                        tempo,
+                        timeDelta
+                        );
+                case (byte)MetaType.TIME_SIGNATURE:
+                    return new TimeSignatureMetaMessage(
+                        msg.Data[0],
+                        (int)Math.Pow(2, msg.Data[1]),
+                        msg.Data[2],
+                        msg.Data[3],
+                        timeDelta
+                        );
+                case (byte)MetaType.KEY_SIGNATURE:
+                    return new KeySignatureMetaMessage(
+                        (sbyte)msg.Data[0],
+                        msg.Data[1],
+                        timeDelta
+                        );
+                default:
+                    throw new ArgumentException("MetaMessage not recognized");
             }
         }
     }
@@ -73,7 +115,7 @@ namespace uMIDI.Common
 
         public override long TimeDelta { get; }
 
-
+        public byte TicksPerBeat { get; set; }
         public byte BeatsPerMeasure { get; set; }
         // Subdivision power of 2 (1 - half note (2), 2 - quarter note (4), etc)
         public byte Subdivision
@@ -87,12 +129,15 @@ namespace uMIDI.Common
                 Subdivision = (byte)Math.Log2(value);
             }
         }
+        public byte ThirtySecondNotesPerBeat { get; set; }
 
         public TimeSignatureMetaMessage(int numerator, int denominator,
-            long timeDelta)
+            byte ticksPerBeat, byte thirtySecondNotesPerBeat, long timeDelta)
         {
             BeatsPerMeasure = (byte)numerator;
             Subdivision = (byte)denominator;
+            TicksPerBeat = ticksPerBeat;
+            ThirtySecondNotesPerBeat = thirtySecondNotesPerBeat;
             TimeDelta = timeDelta;
         }
 
@@ -100,12 +145,11 @@ namespace uMIDI.Common
         {
             get
             {
-                byte metronomeClick = 0; //TODO
                 return new MetaMessage
                 {
-                    MetaType = 0x58,
+                    MetaType = (byte)MetaType.TIME_SIGNATURE,
                     Data = new byte[] { BeatsPerMeasure, Subdivision,
-                        metronomeClick, 8 }
+                        TicksPerBeat, ThirtySecondNotesPerBeat }
                 };
             }
         }
@@ -221,7 +265,7 @@ namespace uMIDI.Common
             {
                 return new MetaMessage
                 {
-                    MetaType = 0x59,
+                    MetaType = (byte)MetaType.KEY_SIGNATURE,
                     Data = new byte[] { (byte)sharpsFlats, majorMinor }
                 };
             }
