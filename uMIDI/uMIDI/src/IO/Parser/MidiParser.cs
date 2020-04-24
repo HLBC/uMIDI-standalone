@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using uMIDI_decoder.Utility;
 using uMIDI.Common;
-using uMIDI_decoder.Models;
+using uMIDI.Utility;
 
-namespace uMIDI_decoder
+namespace uMIDI.IO
 {
     public class MidiParser
     {
@@ -19,6 +18,7 @@ namespace uMIDI_decoder
         private static readonly IDictionary<byte, string> metaEventCodeDictionary = new Dictionary<byte, string> { { 0x00, "sequence number" }, { 0x01, "text event" }, { 0x02, "copyright notice" }, { 0x03, "sequence or track name" }, { 0x04, "instrument name" }, { 0x05, "lyric text" }, { 0x06, "marker text" }, { 0x07, "cue point" }, { 0x20, "MIDI channel prefix assignment" }, { 0x2F, "end of track" }, { 0x51, "tempo setting" }, { 0x54, "SMPTE offset" }, { 0x58, "time signature" }, { 0x59, "key signature" }, { 0x7F, "sequencer specific event" } };
         private static readonly IDictionary<byte, string> trackEventStatusDictionary = new Dictionary<byte, string> { { 0x08, "note off" }, { 0x09, "note on" } };
         private const int chunkBodyLengthSize = 4;
+        private static readonly int BUFFER_SIZE = 32;
 
         #endregion
 
@@ -44,6 +44,22 @@ namespace uMIDI_decoder
                     throw new ArgumentException("Not all strings are at least " + numOfChars + " long. (" + s + ")");
         }
         #endregion
+
+        public MidiFile ConvertMidi(List<byte> midiFile)
+        {
+            MidiFile convertedData = new MidiFile(BUFFER_SIZE);
+            convertedData.AddMessage(DecodeMidi(midiFile));
+
+            return convertedData;
+        }
+
+        public MidiFile ConvertMidi(List<string> midiFile)
+        {
+            MidiFile convertedData = new MidiFile(BUFFER_SIZE);
+            convertedData.AddMessage(DecodeMidi(midiFile));
+
+            return convertedData;
+        }
 
         public List<IMessage> DecodeMidi(List<string> midiFile)
         {

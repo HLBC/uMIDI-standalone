@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using uMIDI.Common;
 
-namespace uMIDI_decoder.Models
+namespace uMIDI.IO
 {
     public class TrackMetaEventInfo
     {

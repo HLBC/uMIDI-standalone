@@ -1,5 +1,5 @@
 ﻿using System;
-namespace uMIDI_decoder.Utility
+namespace uMIDI.Utility
 {
     public class BitByBit
     {
