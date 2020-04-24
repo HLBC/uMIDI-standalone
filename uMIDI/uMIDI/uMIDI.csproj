@@ -6,6 +6,10 @@
 
     <ItemGroup>
       <Folder Include="src\Common\" />
+      <Folder Include="src\IO\" />
+      <Folder Include="tests\" />
+      <Folder Include="tests\Common\" />
+      <Folder Include="src\Transform\" />
     </ItemGroup>
     <ItemGroup>
       <Compile Include=".gitignore" />
