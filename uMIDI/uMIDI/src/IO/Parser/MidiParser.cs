@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using uMIDI_decoder.Utility;
+using uMIDI.Common;
 using uMIDI_decoder.Models;
 
 namespace uMIDI_decoder
@@ -187,7 +188,7 @@ namespace uMIDI_decoder
         /// <returns>A <see cref="List"/> of <see cref="Event"/>s that represent the information from the track chunk.</returns>
         private List<Event> ProcessTrackChunk(List<byte> trackChunk)
         {
-            List<Event> decodedEventList = new List<Event>();
+            List<IMessage> decodedEventList = new List<IMessage>();
             bool endOfTrack = false;
 
             while (!endOfTrack)
@@ -260,13 +261,20 @@ namespace uMIDI_decoder
         private TrackMetaEventInfo ProcessMetaEvent(List<byte> trackChunk, int deltaTime)
         {
             int eventSize = trackChunk[2];
-            MetaEvent metaEvent = new MetaEvent
+            IMessage metaEvent = null;                                  //TODO: need to find a better way to handle this
+            String eventType = metaEventCodeDictionary[trackChunk[1]];
+
+            switch (eventType)
             {
-                EventType = metaEventCodeDictionary[trackChunk[1]],
-                // TODO: EventText is leftover from trackChunk being a list of strings. Don't know what to do yet.
-                EventText = string.Join("", trackChunk.GetRange(3, eventSize)),
-                DeltaTime = deltaTime
-            };
+                case "tempo setting":
+                    metaEvent = new TempoMetaMessage()
+                    {
+                        Tempo = string.Join("", trackChunk.GetRange(3, eventSize)),
+                        Time = deltaTime
+                    };
+                    break;
+                // TODO: Add all the meta message cases
+            }
 
             return new TrackMetaEventInfo
             {
@@ -286,15 +294,19 @@ namespace uMIDI_decoder
         {
             string trackEventType = trackEventStatusDictionary[trackChunk[0]];
             
-            TrackEvent trackEvent = new TrackEvent
+            if (trackEventType == "note on")
             {
-                DeltaTime = deltaTime,
-                EventType = trackEventType,
-                NoteCode = trackChunk[1],
-                NoteVelocity = trackChunk[2],
-                // TODO: Should channel still be a string? probably not right?
-                Channel = BitByBit.Nib2Hex(BitByBit.RightNib(trackChunk[0]))
-            };
+                IMessage trackEvent = new NoteOnMessage()
+                {
+                    Note = new Note()
+                    {
+                        Channel = BitByBit.Nib2Hex(BitByBit.RightNib(trackChunk[0],
+                        Pitch = trackChunk[1],
+                        Velocity = trackChunk[2],
+                        Time = deltaTime
+                    }
+                };
+            }
 
             return new TrackMetaEventInfo
             {
