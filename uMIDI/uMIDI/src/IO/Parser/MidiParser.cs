@@ -110,12 +110,14 @@ namespace uMIDI_decoder
         /// <returns>A <see cref="List"/> containing a single <see cref="IMessage"/>.</returns>
         private IMessage ProcessHeaderChunk(List<byte> headerChunkBody)
         {
+            /*
             return new HeaderEvent()
             {
                 Format = FindFormat(HeaderPartChunk(headerChunkBody, "format")),
                 NumberOfTracks = FindNumberOfTracks(HeaderPartChunk(headerChunkBody, "numberOfTracks")),
                 UnitForDeltaTiming = FindUnitForDeltaTiming(HeaderPartChunk(headerChunkBody, "unitForDeltaTiming"))
-            };
+            };*/
+            return null;
         }
 
         private List<byte> HeaderPartChunk(List<byte> body, string partName)
@@ -264,17 +266,8 @@ namespace uMIDI_decoder
             IMessage metaEvent = null;                                  //TODO: need to find a better way to handle this
             String eventType = metaEventCodeDictionary[trackChunk[1]];
 
-            switch (eventType)
-            {
-                case "tempo setting":
-                    metaEvent = new TempoMetaMessage()
-                    {
-                        Tempo = string.Join("", trackChunk.GetRange(3, eventSize)),
-                        Time = deltaTime
-                    };
-                    break;
-                // TODO: Add all the meta message cases
-            }
+            
+
 
             return new TrackMetaEventInfo
             {
@@ -293,26 +286,31 @@ namespace uMIDI_decoder
         private TrackMetaEventInfo ProcessTrackEvent(List<byte> trackChunk, int deltaTime)
         {
             string trackEventType = trackEventStatusDictionary[trackChunk[0]];
-            
+
+
+
+            /*
             if (trackEventType == "note on")
             {
                 IMessage trackEvent = new NoteOnMessage()
                 {
                     Note = new Note()
                     {
-                        Channel = BitByBit.Nib2Hex(BitByBit.RightNib(trackChunk[0],
+                        Channel = BitByBit.Nib2Hex(BitByBit.RightNib(trackChunk[0])),
                         Pitch = trackChunk[1],
                         Velocity = trackChunk[2],
                         Time = deltaTime
                     }
                 };
-            }
+            } else if (track)
+                
 
             return new TrackMetaEventInfo
             {
                 eventSize = 3,
                 trackOrMetaEvent = trackEvent
-            };
+            };*/
+            return null;
         }
         #endregion
     }
