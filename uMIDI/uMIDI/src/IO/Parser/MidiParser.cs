@@ -80,17 +80,18 @@ namespace uMIDI.IO
         /// </summary>
         /// <param name="chunkIdentifier">A <see cref="List{T}"/> of four hexadecimal bytes.</param>
         /// <returns>true if header chunk; else false.</returns>
-        private bool IsHeaderChunk(List<byte> chunkIdentifier)
+         private bool IsHeaderChunk(List<byte> chunkIdentifier)
         {
             return chunkIdentifier.SequenceEqual(HEADER_CHUNK);
         }
 
-        /// <summary>
-        /// Converts from the hexadecimal bytes from the header chunk into a <see cref="IMessage"/>.
-        /// </summary>
-        /// <param name="headerChunkBody">A <see cref="List{T}"/> of hexadecimal bytes that represent the header's body.</param>
-        /// <returns>A <see cref="List"/> containing a single <see cref="IMessage"/>.</returns>
-        private IMessage ProcessHeaderChunk(List<byte> headerChunkBody)
+
+    /// <summary>
+    /// Converts from the hexadecimal bytes from the header chunk into a <see cref="IMessage"/>.
+    /// </summary>
+    /// <param name="headerChunkBody">A <see cref="List{T}"/> of hexadecimal bytes that represent the header's body.</param>
+    /// <returns>A <see cref="List"/> containing a single <see cref="IMessage"/>.</returns>
+    private IMessage ProcessHeaderChunk(List<byte> headerChunkBody)
         {
             /*
             return new HeaderEvent()
@@ -323,13 +324,85 @@ namespace uMIDI.IO
         /*make public methods for the private methods, Convert midi, Decode Midi, process track chunk, process header chunk testing, process track chunk, process meta event, process trackevent
  for unit testing*/
 
-        public int TestFindChunkBodyLength(list<byte> bodySizeChunk)
+            //public method for testing FinChunkBodyLength
+        public int TestFindChunkBodyLength(List<byte> bodySizeChunk)
         {
             return FindChunkBodyLength(bodySizeChunk);
         }
 
-      
+        //public method for testing IsHeaderChunk
+       public bool TestIsHeaderChunk(List<byte> chunkIdentifier)
+        {
 
-        #endregion 
+            return IsHeaderChunk(chunkIdentifier);
+            
+        }
+        
+        //
+        public IMessage TestProcessHeaderChunk(List<byte> headerChunkBody)
+        {
+
+            return ProcessHeaderChunk(headerChunkBody);
+        }
+
+        //
+        public List<byte> TestHeaderPartChunk(List<byte> body, string partName)
+        {
+
+            return HeaderPartChunk(body, partName);
+        }
+
+        //
+        public string TestFindFormat(List<byte> formatInfo)
+        {
+
+            return FindFormat(formatInfo);
+        }
+
+        //
+        public int TestFindNumberOfTracks(List<byte> numberOfTracksInfo)
+        {
+
+            return FindNumberOfTracks(numberOfTracksInfo);
+        }
+
+        //
+        public int FindUnitForDeltaTiming(List<byte> unitForDeltaTimingInfo)
+        {
+            return FindUnitForDeltaTiming(unitForDeltaTimingInfo);
+        }
+
+        //
+        public bool TestIsTrackChunk(List<byte> chunkIdentifier)
+        {
+            return IsTrackChunk(chunkIdentifier);
+
+        }
+
+        //
+        public List<IMessage> TestProcessTrackChunk(List<byte> trackChunk)
+        {
+            return ProcessTrackChunk(trackChunk);
+        }
+
+        //
+        public static VariableChunkSize<int> TestFindDeltaTime(List<byte> trackChunk)
+        {
+            return FindDeltaTime(trackChunk);
+        }
+
+        //
+        public TrackMetaEventInfo TestProcessMetaEvent(List<byte> trackChunk, int deltaTime)
+        {
+            return ProcessMetaEvent(trackChunk, deltaTime);
+        }
+
+        //
+        public TrackMetaEventInfo TestProcessTrackEvent(List<byte> trackChunk, int deltaTime)
+        {
+            return ProcessTrackEvent(trackChunk, deltaTime);
+        }
+
+        #endregion
     }
 }
