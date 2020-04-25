@@ -318,5 +318,14 @@ namespace uMIDI.IO
             return null;
         }
         #endregion
+
+        #region --Test Hooks--
+
+        public int TestFindChunkBodyLength(List<byte> bodySizeChunk)
+        {
+            return FindChunkBodyLength(bodySizeChunk);
+        }
+
+        #endregion
     }
 }
