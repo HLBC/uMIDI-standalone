@@ -321,16 +321,15 @@ namespace uMIDI.IO
         #endregion
         #region --Test Hooks--
 
-        /*make public methods for the private methods, Convert midi, Decode Midi, process track chunk, process header chunk testing, process track chunk, process meta event, process trackevent
- for unit testing*/
+        /*make public methods for the private methods for unit testing*/
 
-            //public method for testing FinChunkBodyLength
+            //public method for Unit testing FinChunkBodyLength
         public int TestFindChunkBodyLength(List<byte> bodySizeChunk)
         {
             return FindChunkBodyLength(bodySizeChunk);
         }
 
-        //public method for testing IsHeaderChunk
+        //public method for Unit testing IsHeaderChunk
        public bool TestIsHeaderChunk(List<byte> chunkIdentifier)
         {
 
@@ -338,66 +337,66 @@ namespace uMIDI.IO
             
         }
         
-        //
+        //public method for testing ProcessHeaderChunk
         public IMessage TestProcessHeaderChunk(List<byte> headerChunkBody)
         {
 
             return ProcessHeaderChunk(headerChunkBody);
         }
 
-        //
+        //public method for Unit testing HeaderPartChunk
         public List<byte> TestHeaderPartChunk(List<byte> body, string partName)
         {
 
             return HeaderPartChunk(body, partName);
         }
 
-        //
+        //public method for Unit testing FindFormat
         public string TestFindFormat(List<byte> formatInfo)
         {
 
             return FindFormat(formatInfo);
         }
 
-        //
+        //public method for Unit testing
         public int TestFindNumberOfTracks(List<byte> numberOfTracksInfo)
         {
 
             return FindNumberOfTracks(numberOfTracksInfo);
         }
 
-        //
+        //public method for Unit testing
         public int FindUnitForDeltaTiming(List<byte> unitForDeltaTimingInfo)
         {
             return FindUnitForDeltaTiming(unitForDeltaTimingInfo);
         }
 
-        //
+        //public method for Unit testing
         public bool TestIsTrackChunk(List<byte> chunkIdentifier)
         {
             return IsTrackChunk(chunkIdentifier);
 
         }
 
-        //
+        //public method for Unit testing
         public List<IMessage> TestProcessTrackChunk(List<byte> trackChunk)
         {
             return ProcessTrackChunk(trackChunk);
         }
 
-        //
+        //public method for Unit testing
         public static VariableChunkSize<int> TestFindDeltaTime(List<byte> trackChunk)
         {
             return FindDeltaTime(trackChunk);
         }
 
-        //
+        //public method for Unit testing
         public TrackMetaEventInfo TestProcessMetaEvent(List<byte> trackChunk, int deltaTime)
         {
             return ProcessMetaEvent(trackChunk, deltaTime);
         }
 
-        //
+        //public method for Unit testing
         public TrackMetaEventInfo TestProcessTrackEvent(List<byte> trackChunk, int deltaTime)
         {
             return ProcessTrackEvent(trackChunk, deltaTime);
