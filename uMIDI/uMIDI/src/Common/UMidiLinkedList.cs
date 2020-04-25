@@ -106,6 +106,12 @@ namespace uMIDI.src.Common
             return new UMidiLinkedListEnumerator<T>(this);
         }
 
+        // TODO: This method is required, but not sure if exactly what is desired
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new UMidiLinkedListEnumerator<T>(this);
+        }
+
         public int IndexOf(T item)
         {
             UMidiLinkedListNode<T> node = head;

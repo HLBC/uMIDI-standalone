@@ -21,40 +21,9 @@ namespace uMIDI.Common
 
     public interface IMessage
     {
-        public MidiMessage Message { get; }
+        MidiMessage Message { get; }
 
-        public long TimeDelta { get; }
-
-        public static IMessage ToIMessage(MidiMessage msg, long timeDelta)
-        {
-            if (0x80 <= msg.Status && msg.Status < 0x90)
-            {
-                return new NoteOffMessage(new Note(
-                    (byte)(msg.Status % 0x10),
-                    msg.Data[0],
-                    msg.Data[1],
-                    timeDelta
-                    ));
-            }
-            else if (0x90 <= msg.Status && msg.Status < 0xa0)
-            {
-                return new NoteOnMessage(new Note(
-                    (byte)(msg.Status % 0x10),
-                    msg.Data[0],
-                    msg.Data[1],
-                    timeDelta
-                    ));
-            }
-            else if (msg.Status == 0xff)
-            {
-                throw new ArgumentException("This is a meta event. Please " +
-                    "use the IMetaMessage.ToIMetaMessage() static method.");
-            }
-            else
-            {
-                throw new ArgumentException("MidiMessage not recognized");
-            }
-        }
+        long TimeDelta { get; }
     }
 
     public class NoteOffMessage : IMessage

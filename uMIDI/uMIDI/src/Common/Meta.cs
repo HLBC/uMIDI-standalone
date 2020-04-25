@@ -39,41 +39,6 @@ namespace uMIDI.Common
                 };
             }
         }
-
-        public static IMetaMessage ToIMetaMessage(MetaMessage msg,
-            long timeDelta)
-        {
-            switch (msg.MetaType)
-            {
-                case (byte)MetaType.TEMPO:
-                    byte data1 = msg.Data[0];
-                    byte data2 = msg.Data[1];
-                    byte data3 = msg.Data[2];
-                    int microsecondsPerBeat = data1 * 0x10000 + data2 * 0x100 +
-                        data3;
-                    double tempo = 60 * 1e6 / (double)microsecondsPerBeat;
-                    return new TempoMetaMessage(
-                        tempo,
-                        timeDelta
-                        );
-                case (byte)MetaType.TIME_SIGNATURE:
-                    return new TimeSignatureMetaMessage(
-                        msg.Data[0],
-                        (int)Math.Pow(2, msg.Data[1]),
-                        msg.Data[2],
-                        msg.Data[3],
-                        timeDelta
-                        );
-                case (byte)MetaType.KEY_SIGNATURE:
-                    return new KeySignatureMetaMessage(
-                        (sbyte)msg.Data[0],
-                        msg.Data[1],
-                        timeDelta
-                        );
-                default:
-                    throw new ArgumentException("MetaMessage not recognized");
-            }
-        }
     }
 
     public class TempoMetaMessage : IMetaMessage
@@ -126,7 +91,7 @@ namespace uMIDI.Common
                 if (!(new List<int>() { 2, 4, 8, 16, 32 }).Contains(value))
                     throw new ArgumentException(
                         "Illegal time signature denominator");
-                Subdivision = (byte)Math.Log2(value);
+                Subdivision = (byte)(Math.Log(value) / Math.Log(2)); // log2(value) via change base rule
             }
         }
         public byte ThirtySecondNotesPerBeat { get; set; }

@@ -7,7 +7,7 @@ namespace uMIDI.Transform
 {
     public interface ITransform
     {
-        public MidiStream MidiStream { get; }
-        public LinkedList<IMessage> Apply(LinkedList<IMessage> buffer);
+        MidiStream MidiStream { get; }
+        LinkedList<IMessage> Apply(LinkedList<IMessage> buffer);
     }
 }

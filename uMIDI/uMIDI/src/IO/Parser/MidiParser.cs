@@ -86,12 +86,12 @@ namespace uMIDI.IO
         }
 
 
-    /// <summary>
-    /// Converts from the hexadecimal bytes from the header chunk into a <see cref="IMessage"/>.
-    /// </summary>
-    /// <param name="headerChunkBody">A <see cref="List{T}"/> of hexadecimal bytes that represent the header's body.</param>
-    /// <returns>A <see cref="List"/> containing a single <see cref="IMessage"/>.</returns>
-    private IMessage ProcessHeaderChunk(List<byte> headerChunkBody)
+        /// <summary>
+        /// Converts from the hexadecimal bytes from the header chunk into a <see cref="IMessage"/>.
+        /// </summary>
+        /// <param name="headerChunkBody">A <see cref="List{T}"/> of hexadecimal bytes that represent the header's body.</param>
+        /// <returns>A <see cref="List"/> containing a single <see cref="IMessage"/>.</returns>
+        private IMessage ProcessHeaderChunk(List<byte> headerChunkBody)
         {
             /*
             return new HeaderEvent()
@@ -261,7 +261,7 @@ namespace uMIDI.IO
                 Data = data
             };
 
-            IMetaMessage metaMessage = IMetaMessage.ToIMetaMessage(message, deltaTime);
+            IMetaMessage metaMessage = IMessageUtility.ToIMetaMessage(message, deltaTime);
             /*
             switch (eventType)
             {
@@ -320,86 +320,101 @@ namespace uMIDI.IO
         }
         #endregion
         #region --Test Hooks--
+        public class TestHook
+        {
+            private MidiParser instance;
 
-        /*make public methods for the private methods for unit testing*/
+            public TestHook(MidiParser instance)
+            {
+                this.instance = instance;
+            }
+
+            /*make public methods for the private methods for unit testing*/
 
             //public method for Unit testing FinChunkBodyLength
-        public int TestFindChunkBodyLength(List<byte> bodySizeChunk)
-        {
-            return FindChunkBodyLength(bodySizeChunk);
-        }
+            public int TestFindChunkBodyLength(List<byte> bodySizeChunk)
+            {
+                return instance.FindChunkBodyLength(bodySizeChunk);
+            }
 
-        //public method for Unit testing IsHeaderChunk
-       public bool TestIsHeaderChunk(List<byte> chunkIdentifier)
-        {
+            //public method for Unit testing IsHeaderChunk
+            public bool TestIsHeaderChunk(List<byte> chunkIdentifier)
+            {
 
-            return IsHeaderChunk(chunkIdentifier);
-            
-        }
-        
-        //public method for testing ProcessHeaderChunk
-        public IMessage TestProcessHeaderChunk(List<byte> headerChunkBody)
-        {
+                return instance.IsHeaderChunk(chunkIdentifier);
 
-            return ProcessHeaderChunk(headerChunkBody);
-        }
+            }
 
-        //public method for Unit testing HeaderPartChunk
-        public List<byte> TestHeaderPartChunk(List<byte> body, string partName)
-        {
+            //public method for testing ProcessHeaderChunk
+            public IMessage TestProcessHeaderChunk(List<byte> headerChunkBody)
+            {
 
-            return HeaderPartChunk(body, partName);
-        }
+                return instance.ProcessHeaderChunk(headerChunkBody);
+            }
 
-        //public method for Unit testing FindFormat
-        public string TestFindFormat(List<byte> formatInfo)
-        {
+            //public method for Unit testing HeaderPartChunk
+            public List<byte> TestHeaderPartChunk(List<byte> body, string partName)
+            {
 
-            return FindFormat(formatInfo);
-        }
+                return instance.HeaderPartChunk(body, partName);
+            }
 
-        //public method for Unit testing
-        public int TestFindNumberOfTracks(List<byte> numberOfTracksInfo)
-        {
+            //public method for Unit testing FindFormat
+            public string TestFindFormat(List<byte> formatInfo)
+            {
 
-            return FindNumberOfTracks(numberOfTracksInfo);
-        }
+                return instance.FindFormat(formatInfo);
+            }
 
-        //public method for Unit testing
-        public int TestFindUnitForDeltaTiming(List<byte> unitForDeltaTimingInfo)
-        {
-            return FindUnitForDeltaTiming(unitForDeltaTimingInfo);
-        }
+            //public method for Unit testing
+            public int TestFindNumberOfTracks(List<byte> numberOfTracksInfo)
+            {
 
-        //public method for Unit testing
-        public bool TestIsTrackChunk(List<byte> chunkIdentifier)
-        {
-            return IsTrackChunk(chunkIdentifier);
+                return instance.FindNumberOfTracks(numberOfTracksInfo);
+            }
 
-        }
+            //public method for Unit testing
+            public int TestFindUnitForDeltaTiming(List<byte> unitForDeltaTimingInfo)
+            {
+                return instance.FindUnitForDeltaTiming(unitForDeltaTimingInfo);
+            }
 
-        //public method for Unit testing
-        public List<IMessage> TestProcessTrackChunk(List<byte> trackChunk)
-        {
-            return ProcessTrackChunk(trackChunk);
-        }
+            //public method for Unit testing
+            public bool TestIsTrackChunk(List<byte> chunkIdentifier)
+            {
+                return instance.IsTrackChunk(chunkIdentifier);
 
-        //public method for Unit testing
-        public static VariableChunkSize<int> TestFindDeltaTime(List<byte> trackChunk)
-        {
-            return FindDeltaTime(trackChunk);
-        }
+            }
 
-        //public method for Unit testing
-        public TrackMetaEventInfo TestProcessMetaEvent(List<byte> trackChunk, int deltaTime)
-        {
-            return ProcessMetaEvent(trackChunk, deltaTime);
-        }
+            //public method for Unit testing
+            public List<IMessage> TestProcessTrackChunk(List<byte> trackChunk)
+            {
+                return instance.ProcessTrackChunk(trackChunk);
+            }
 
-        //public method for Unit testing
-        public TrackMetaEventInfo TestProcessTrackEvent(List<byte> trackChunk, int deltaTime)
-        {
-            return ProcessTrackEvent(trackChunk, deltaTime);
+            //public method for Unit testing
+            public int TestFindDeltaTimeChunkSize(List<byte> trackChunk)
+            {
+                return FindDeltaTime(trackChunk).chunkSize;
+            }
+
+            //public method for Unit testing
+            public int TestFindDeltaTimeData(List<byte> trackChunk)
+            {
+                return FindDeltaTime(trackChunk).data;
+            }
+
+            //public method for Unit testing
+            public TrackMetaEventInfo TestProcessMetaEvent(List<byte> trackChunk, int deltaTime)
+            {
+                return instance.ProcessMetaEvent(trackChunk, deltaTime);
+            }
+
+            //public method for Unit testing
+            public TrackMetaEventInfo TestProcessTrackEvent(List<byte> trackChunk, int deltaTime)
+            {
+                return instance.ProcessTrackEvent(trackChunk, deltaTime);
+            }
         }
 
         #endregion
