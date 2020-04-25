@@ -24,46 +24,12 @@ namespace uMIDI.IO
 
         #region --Functions--
 
-
-        #region Temporary fix to using strings over bytes
-        private static List<byte> Strings2Bytes(List<string> strings)
+        public MidiFile ConvertMidi(List<byte> midiFile, MetaMidiStream stream)
         {
-            CheckSizes(strings, 2);
-
-            List<byte> bytes = new List<byte>(strings.Count);
-
-            foreach (string s in strings) bytes.Add(HexByte.Paired(s[0], s[1]).Value());
-
-            return bytes;
-        }
-
-        private static void CheckSizes(List<string> strings, int numOfChars)
-        {
-            foreach (string s in strings)
-                if (s.Length < numOfChars)
-                    throw new ArgumentException("Not all strings are at least " + numOfChars + " long. (" + s + ")");
-        }
-        #endregion
-
-        public MidiFile ConvertMidi(List<byte> midiFile)
-        {
-            MidiFile convertedData = new MidiFile(BUFFER_SIZE);
-            convertedData.AddMessage(DecodeMidi(midiFile));
+            MidiFile convertedData = new MidiFile(stream, DecodeMidi(midiFile), BUFFER_SIZE);
+            
 
             return convertedData;
-        }
-
-        public MidiFile ConvertMidi(List<string> midiFile)
-        {
-            MidiFile convertedData = new MidiFile(BUFFER_SIZE);
-            convertedData.AddMessage(DecodeMidi(midiFile));
-
-            return convertedData;
-        }
-
-        public List<IMessage> DecodeMidi(List<string> midiFile)
-        {
-            return DecodeMidi(Strings2Bytes(midiFile));
         }
 
         public List<IMessage> DecodeMidi(List<byte> midiFile)
@@ -287,13 +253,14 @@ namespace uMIDI.IO
             {
                 data[i] = trackChunk[2 + i];
             }
+
             MetaMessage message = new MetaMessage
             {
                 MetaType = trackChunk[1],
                 Data = data
-            }
-            IMetaMessage metaMessage = IMetaMessage.ToIMetaMessage(message,
-                deltaTime);
+            };
+
+            IMetaMessage metaMessage = IMetaMessage.ToIMetaMessage(message, deltaTime);
             /*
             switch (eventType)
             {
@@ -315,7 +282,6 @@ namespace uMIDI.IO
             };
         }
 
-        //TODO: have some conditionals on the trackEventType
         /// <summary>
         /// Converts from the hexadecimal bytes of a trac event into a <see cref="TrackMetaEventInfo"/>.
         /// </summary>

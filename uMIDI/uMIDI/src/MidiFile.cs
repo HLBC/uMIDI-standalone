@@ -13,8 +13,7 @@ namespace uMIDI
         private List<IMessage> _messages;
         private int _playHead;
 
-        public MidiFile(MetaMidiStream stream, List<IMessage> messages,
-            int bufferSize)
+        public MidiFile(MetaMidiStream stream, List<IMessage> messages, int bufferSize)
         {
             MetaStream = stream;
             BufferSize = bufferSize;
