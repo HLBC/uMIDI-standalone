@@ -366,7 +366,7 @@ namespace uMIDI.IO
         }
 
         //public method for Unit testing
-        public int FindUnitForDeltaTiming(List<byte> unitForDeltaTimingInfo)
+        public int TestFindUnitForDeltaTiming(List<byte> unitForDeltaTimingInfo)
         {
             return FindUnitForDeltaTiming(unitForDeltaTimingInfo);
         }
