@@ -245,14 +245,8 @@ namespace uMIDI.IO
         private TrackMetaEventInfo ProcessMetaEvent(List<byte> trackChunk, int deltaTime)
         {
             int eventSize = trackChunk[2];
-            IMessage metaEvent = null;                                  //TODO: need to find a better way to handle this
-            String eventType = metaEventCodeDictionary[trackChunk[1]];
 
-            byte[] data = new byte[eventSize];
-            for (int i = 0; i < eventSize; i++)
-            {
-                data[i] = trackChunk[2 + i];
-            }
+            byte[] data = trackChunk.GetRange(3, eventSize).ToArray();
 
             MetaMessage message = new MetaMessage
             {
@@ -261,24 +255,11 @@ namespace uMIDI.IO
             };
 
             IMetaMessage metaMessage = IMetaMessage.ToIMetaMessage(message, deltaTime);
-            /*
-            switch (eventType)
-            {
-                case "tempo setting":
-                    metaEvent = new TempoMetaMessage()
-                    {
-                        Tempo = string.Join("", trackChunk.GetRange(3, eventSize)),
-                        Time = deltaTime
-                    };
-                    break;
-                // TODO: Add all the meta message cases
-            }
-            */
 
             return new TrackMetaEventInfo
             {
                 eventSize = eventSize,
-                trackOrMetaEvent = metaEvent
+                trackOrMetaEvent = metaMessage
             };
         }
 
@@ -290,32 +271,22 @@ namespace uMIDI.IO
         /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="IMessage"/> information and the number of bytes the meta event was.</returns>
         private TrackMetaEventInfo ProcessTrackEvent(List<byte> trackChunk, int deltaTime)
         {
-            string trackEventType = trackEventStatusDictionary[trackChunk[0]];
+            string eventType = trackEventStatusDictionary[trackChunk[0]];
 
-
-
-            /*
-            if (trackEventType == "note on")
+            MidiMessage message = new MidiMessage
             {
-                IMessage trackEvent = new NoteOnMessage()
-                {
-                    Note = new Note()
-                    {
-                        Channel = BitByBit.Nib2Hex(BitByBit.RightNib(trackChunk[0])),
-                        Pitch = trackChunk[1],
-                        Velocity = trackChunk[2],
-                        Time = deltaTime
-                    }
-                };
-            } else if (track)
-                
+                Status = trackChunk[0],
+                TimeDelta = deltaTime,
+                Data = trackChunk.GetRange(1, 2).ToArray()
+            };
+
+            IMessage trackMessage = IMessage.ToIMessage(message, deltaTime);
 
             return new TrackMetaEventInfo
             {
                 eventSize = 3,
-                trackOrMetaEvent = trackEvent
-            };*/
-            return null;
+                trackOrMetaEvent = trackMessage
+            };
         }
         #endregion
 
