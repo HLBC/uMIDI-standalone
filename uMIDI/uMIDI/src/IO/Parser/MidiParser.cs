@@ -318,5 +318,17 @@ namespace uMIDI.IO
             return null;
         }
         #endregion
+
+        #region --Test Hooks--
+
+        /*make public methods for the private methods, Convert midi, Decode Midi, process track chunk, process header chunk testing, process track chunk, process meta event, process trackevent
+ for unit testing*/
+
+        public int TestFindChunkBodyLength (list<byte> bodySizeChunk)
+        {
+            return FindChunkBodyLength(bodySizeChunk);
+        }
+
+        #endregion 
     }
 }
