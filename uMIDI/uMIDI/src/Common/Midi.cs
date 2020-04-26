@@ -12,7 +12,7 @@ namespace uMIDI.Common
 
         public bool Equals([AllowNull] MidiMessage other)
         {
-            return Status == other.Status && Data.Equals(other.Data)
+            return Status == other.Status && Data.SequenceEqual(other.Data)
                 && TimeDelta == other.TimeDelta;
         }
 
@@ -23,6 +23,12 @@ namespace uMIDI.Common
             arr[0] = Status;
             Data.CopyTo(arr, 1);
             return arr;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("MidiMessage [Status: {0}, Data: [{1}], " +
+                "TimeDelta: {2}]", Status, String.Join(", ", Data), TimeDelta);
         }
     }
 

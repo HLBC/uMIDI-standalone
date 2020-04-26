@@ -1,8 +1,9 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace uMIDI.Common
 {
-    public class Note
+    public class Note : IEquatable<Note>
     {
         public byte Channel { get; set; }
         public byte Pitch { get; set; }
@@ -81,9 +82,15 @@ namespace uMIDI.Common
             // TODO (maybe; maybe we don't need it)
             throw new NotImplementedException();
         }
+
+        public bool Equals([AllowNull] Note other)
+        {
+            return Channel == other.Channel && Pitch == other.Pitch
+                && Velocity == other.Velocity;
+        }
     }
 
-    public class KeySignature
+    public class KeySignature : IEquatable<KeySignature>
     {
         public Tonic Tonic { get; set; }
         public Scale Scale { get; set; }
@@ -92,6 +99,11 @@ namespace uMIDI.Common
         {
             Tonic = tonic;
             Scale = scale;
+        }
+
+        public bool Equals([AllowNull] KeySignature other)
+        {
+            return Tonic == other.Tonic && Scale == other.Scale;
         }
     }
 
