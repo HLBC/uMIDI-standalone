@@ -1,13 +1,20 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace uMIDI.Common
 {
-    public struct MidiMessage
+    public struct MidiMessage : IEquatable<MidiMessage>
     {
         public byte Status;
         public byte[] Data;
         public long TimeDelta;
+
+        public bool Equals([AllowNull] MidiMessage other)
+        {
+            return Status == other.Status && Data.Equals(other.Data)
+                && TimeDelta == other.TimeDelta;
+        }
 
         public byte[] ToBytes()
         {
@@ -19,11 +26,17 @@ namespace uMIDI.Common
         }
     }
 
-    public abstract class AbstractMessage
+    public abstract class AbstractMessage : IEquatable<AbstractMessage>
     {
         public abstract MidiMessage Message { get; }
 
         public abstract long TimeDelta { get; }
+
+        public bool Equals([AllowNull] AbstractMessage other)
+        {
+            return Message.Equals(other.Message)
+                && TimeDelta.Equals(other.TimeDelta);
+        }
     }
 
     public class NoteOffMessage : AbstractMessage
