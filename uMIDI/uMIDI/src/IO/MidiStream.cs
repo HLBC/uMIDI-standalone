@@ -11,9 +11,9 @@ namespace uMIDI.IO
         private LinkedList<AbstractMessage> buffer;
         private int bufferCount;
 
-        public MidiStream()
+        public MidiStream(int ticksPerBeat)
         {
-            State = new MidiStreamState();
+            State = new MidiStreamState(ticksPerBeat);
             instruments = new HashSet<IMidiInstrument>();
             bufferCount = 0;
         }

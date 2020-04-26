@@ -11,10 +11,11 @@ namespace uMIDI.IO
         public MidiStream MidiStream { get; }
         public List<ITransform> Transforms { get; set; }
 
-        public MetaMidiStream(int beatsPerMeasure, int subdivision, int bpm)
+        public MetaMidiStream(int ticksPerBeat, int beatsPerMeasure,
+            int subdivision, int bpm)
         {
             MetaState = new MetaState(beatsPerMeasure, subdivision, bpm);
-            MidiStream = new MidiStream();
+            MidiStream = new MidiStream(ticksPerBeat);
             Transforms = new List<ITransform>();
         }
 

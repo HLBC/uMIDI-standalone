@@ -1,5 +1,4 @@
-﻿using System;
-namespace uMIDI.IO
+﻿namespace uMIDI.IO
 {
     public class MetaState
     {
