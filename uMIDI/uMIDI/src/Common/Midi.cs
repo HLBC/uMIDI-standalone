@@ -26,13 +26,19 @@ namespace uMIDI.Common
         }
     }
 
-    public abstract class AbstractMessage : IEquatable<AbstractMessage>
+    public interface IMessage : IEquatable<IMessage>
+    {
+        MidiMessage Message { get; }
+        long TimeDelta { get; }
+    }
+
+    public abstract class AbstractMessage : IMessage
     {
         public abstract MidiMessage Message { get; }
 
         public abstract long TimeDelta { get; }
 
-        public bool Equals([AllowNull] AbstractMessage other)
+        public bool Equals([AllowNull] IMessage other)
         {
             return Message.Equals(other.Message)
                 && TimeDelta.Equals(other.TimeDelta);

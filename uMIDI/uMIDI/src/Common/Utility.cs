@@ -6,7 +6,7 @@ namespace uMIDI.Common
     {
         private MessageUtility() { }
 
-        public static AbstractMessage Bytes2Message(MidiMessage msg, long timeDelta)
+        public static IMessage ToIMessage(MidiMessage msg, long timeDelta)
         {
             if (0x80 <= msg.Status && msg.Status < 0x90)
             {
@@ -37,7 +37,7 @@ namespace uMIDI.Common
             }
         }
 
-        public static AbstractMetaMessage Bytes2MetaMessage(MetaMessage msg,
+        public static IMetaMessage ToMetaMessage(MetaMessage msg,
             long timeDelta)
         {
             switch (msg.MetaType)

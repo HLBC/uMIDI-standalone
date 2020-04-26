@@ -16,9 +16,14 @@ namespace uMIDI.Common
         public byte[] Data;
     }
 
-    public abstract class AbstractMetaMessage : AbstractMessage
+    public interface IMetaMessage : IMessage
     {
-        public abstract MetaMessage MMessage { get; }
+        MetaMessage MetaMessage { get; }
+    }
+
+    public abstract class AbstractMetaMessage : AbstractMessage, IMetaMessage
+    {
+        public abstract MetaMessage MetaMessage { get; }
 
         public override MidiMessage Message
         {
@@ -26,10 +31,10 @@ namespace uMIDI.Common
             {
                 // Length of data array, plus one byte for the type code, and
                 // one byte for the length
-                byte[] data = new byte[MMessage.Data.Length + 2];
-                data[0] = MMessage.MetaType;
-                data[1] = (byte)MMessage.Data.Length;
-                MMessage.Data.CopyTo(data, 2);
+                byte[] data = new byte[MetaMessage.Data.Length + 2];
+                data[0] = MetaMessage.MetaType;
+                data[1] = (byte)MetaMessage.Data.Length;
+                MetaMessage.Data.CopyTo(data, 2);
                 return new MidiMessage
                 {
                     Status = 0xff,
@@ -56,7 +61,7 @@ namespace uMIDI.Common
             TimeDelta = timeDelta;
         }
 
-        public override MetaMessage MMessage
+        public override MetaMessage MetaMessage
         {
             get
             {
@@ -105,7 +110,7 @@ namespace uMIDI.Common
             TimeDelta = timeDelta;
         }
 
-        public override MetaMessage MMessage
+        public override MetaMessage MetaMessage
         {
             get
             {
@@ -223,7 +228,7 @@ namespace uMIDI.Common
             TimeDelta = timeDelta;
         }
 
-        public override MetaMessage MMessage
+        public override MetaMessage MetaMessage
         {
             get
             {
