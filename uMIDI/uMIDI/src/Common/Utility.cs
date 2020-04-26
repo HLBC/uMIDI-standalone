@@ -2,29 +2,29 @@
 
 namespace uMIDI.Common
 {
-    public class IMessageUtility
+    public class MessageUtility
     {
-        private IMessageUtility() { }
+        private MessageUtility() { }
 
-        public static IMessage ToIMessage(MidiMessage msg, long timeDelta)
+        public static AbstractMessage Bytes2Message(MidiMessage msg, long timeDelta)
         {
             if (0x80 <= msg.Status && msg.Status < 0x90)
             {
                 return new NoteOffMessage(new Note(
                     (byte)(msg.Status % 0x10),
                     msg.Data[0],
-                    msg.Data[1],
-                    timeDelta
-                    ));
+                    msg.Data[1]
+                    ),
+                    timeDelta);
             }
             else if (0x90 <= msg.Status && msg.Status < 0xa0)
             {
                 return new NoteOnMessage(new Note(
                     (byte)(msg.Status % 0x10),
                     msg.Data[0],
-                    msg.Data[1],
-                    timeDelta
-                    ));
+                    msg.Data[1]
+                    ),
+                    timeDelta);
             }
             else if (msg.Status == 0xff)
             {
@@ -37,7 +37,7 @@ namespace uMIDI.Common
             }
         }
 
-        public static IMetaMessage ToIMetaMessage(MetaMessage msg,
+        public static AbstractMetaMessage Bytes2MetaMessage(MetaMessage msg,
             long timeDelta)
         {
             switch (msg.MetaType)

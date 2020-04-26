@@ -18,12 +18,12 @@ namespace uMIDI.IO
             Transforms = new List<ITransform>();
         }
 
-        public void PushBuffer(IMessage[] messages)
+        public void PushBuffer(AbstractMessage[] messages)
         {
             // Add messages to buffer, applying transformations
-            LinkedList<IMessage> buffer = new LinkedList<IMessage>();
+            LinkedList<AbstractMessage> buffer = new LinkedList<AbstractMessage>();
 
-            foreach (IMessage message in messages)
+            foreach (AbstractMessage message in messages)
             {
                 buffer.AddLast(message);
             }

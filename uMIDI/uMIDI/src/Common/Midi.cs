@@ -19,18 +19,18 @@ namespace uMIDI.Common
         }
     }
 
-    public interface IMessage
+    public abstract class AbstractMessage
     {
-        MidiMessage Message { get; }
+        public abstract MidiMessage Message { get; }
 
-        long TimeDelta { get; }
+        public abstract long TimeDelta { get; }
     }
 
-    public class NoteOffMessage : IMessage
+    public class NoteOffMessage : AbstractMessage
     {
         public Note Note { get; }
 
-        public long TimeDelta { get; }
+        public override long TimeDelta { get; }
 
         public NoteOffMessage(Note note, long timeDelta)
         {
@@ -38,7 +38,7 @@ namespace uMIDI.Common
             TimeDelta = timeDelta;
         }
 
-        public MidiMessage Message
+        public override MidiMessage Message
         {
             get
             {
@@ -52,11 +52,11 @@ namespace uMIDI.Common
         }
     }
 
-    public class NoteOnMessage : IMessage
+    public class NoteOnMessage : AbstractMessage
     {
         public Note Note { get; }
 
-        public long TimeDelta { get; }
+        public override long TimeDelta { get; }
 
         public NoteOnMessage(Note note, long timeDelta)
         {
@@ -64,7 +64,7 @@ namespace uMIDI.Common
             TimeDelta = timeDelta;
         }
 
-        public MidiMessage Message
+        public override MidiMessage Message
         {
             get
             {

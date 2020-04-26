@@ -10,30 +10,30 @@ namespace uMIDI
         public MetaMidiStream MetaStream { get; }
         public int BufferSize { get; }
         public bool EndOfFile { get; }
-        private List<IMessage> _messages;
+        private List<AbstractMessage> _messages;
         private int _playHead;
 
-        public MidiFile(MetaMidiStream stream, List<IMessage> messages, int bufferSize)
+        public MidiFile(MetaMidiStream stream, List<AbstractMessage> messages, int bufferSize)
         {
             MetaStream = stream;
             BufferSize = bufferSize;
             EndOfFile = false;
-            _messages = new List<IMessage>();
+            _messages = new List<AbstractMessage>();
             _playHead = 0;
         }
 
-        public void AddMessage(IMessage messageData)
+        public void AddMessage(AbstractMessage messageData)
         {
             _messages.Add(messageData);
         }
 
-        public void AddMessage(List<IMessage> messageData)
+        public void AddMessage(List<AbstractMessage> messageData)
         {
             _messages.AddRange(messageData);
         }
 
         public MidiFile(int bufferSize, int beatsPerMeasure, int subdivision,
-            int bpm, List<IMessage> messages) : this(
+            int bpm, List<AbstractMessage> messages) : this(
                 new MetaMidiStream(beatsPerMeasure, subdivision, bpm),
                 messages, bufferSize)
         {

@@ -8,6 +8,6 @@ namespace uMIDI.Transform
     public interface ITransform
     {
         MidiStream MidiStream { get; }
-        LinkedList<IMessage> Apply(LinkedList<IMessage> buffer);
+        LinkedList<AbstractMessage> Apply(LinkedList<AbstractMessage> buffer);
     }
 }

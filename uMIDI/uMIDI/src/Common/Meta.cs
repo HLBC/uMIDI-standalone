@@ -16,12 +16,11 @@ namespace uMIDI.Common
         public byte[] Data;
     }
 
-    public abstract class IMetaMessage : IMessage
+    public abstract class AbstractMetaMessage : AbstractMessage
     {
         public abstract MetaMessage MMessage { get; }
-        public abstract long TimeDelta { get; }
 
-        public MidiMessage Message
+        public override MidiMessage Message
         {
             get
             {
@@ -41,7 +40,7 @@ namespace uMIDI.Common
         }
     }
 
-    public class TempoMetaMessage : IMetaMessage
+    public class TempoMetaMessage : AbstractMetaMessage
     {
         // Tempo in *quarter notes* per minute
         public double Tempo { get; set; }
@@ -75,7 +74,7 @@ namespace uMIDI.Common
         }
     }
 
-    public class TimeSignatureMetaMessage : IMetaMessage
+    public class TimeSignatureMetaMessage : AbstractMetaMessage
     {
 
         public override long TimeDelta { get; }
@@ -120,7 +119,7 @@ namespace uMIDI.Common
         }
     }
 
-    public class KeySignatureMetaMessage : IMetaMessage
+    public class KeySignatureMetaMessage : AbstractMetaMessage
     {
         public override long TimeDelta { get; }
 

@@ -11,10 +11,10 @@ namespace uMIDI.IO
         #region --Constants--
 
         private static readonly List<byte> HEADER_CHUNK = new List<byte> { 0x4d, 0x54, 0x68, 0x64 };
-        private static readonly List<byte> TRACK_CHUNK  = new List<byte> { 0x4d, 0x54, 0x72, 0x6b };
+        private static readonly List<byte> TRACK_CHUNK = new List<byte> { 0x4d, 0x54, 0x72, 0x6b };
         private static readonly IDictionary<int, string> FORMATS = new Dictionary<int, string> { { 0, "single track file format" }, { 1, "multiple track file format" }, { 2, "multiple song file format" } };
         private static readonly IDictionary<string, int> HEADER_PART_LOCATIONS = new Dictionary<string, int> { { "format", 0 }, { "numberOfTracks", 2 }, { "unitForDeltaTiming", 4 } };
-        private static readonly IDictionary<string, int> HEADER_PART_SIZES     = new Dictionary<string, int> { { "format", 2 }, { "numberOfTracks", 2 }, { "unitForDeltaTiming", 2 } };
+        private static readonly IDictionary<string, int> HEADER_PART_SIZES = new Dictionary<string, int> { { "format", 2 }, { "numberOfTracks", 2 }, { "unitForDeltaTiming", 2 } };
         private static readonly IDictionary<byte, string> metaEventCodeDictionary = new Dictionary<byte, string> { { 0x00, "sequence number" }, { 0x01, "text event" }, { 0x02, "copyright notice" }, { 0x03, "sequence or track name" }, { 0x04, "instrument name" }, { 0x05, "lyric text" }, { 0x06, "marker text" }, { 0x07, "cue point" }, { 0x20, "MIDI channel prefix assignment" }, { 0x2F, "end of track" }, { 0x51, "tempo setting" }, { 0x54, "SMPTE offset" }, { 0x58, "time signature" }, { 0x59, "key signature" }, { 0x7F, "sequencer specific event" } };
         private static readonly IDictionary<byte, string> trackEventStatusDictionary = new Dictionary<byte, string> { { 0x08, "note off" }, { 0x09, "note on" } };
         private const int chunkBodyLengthSize = 4;
@@ -27,14 +27,14 @@ namespace uMIDI.IO
         public MidiFile ConvertMidi(List<byte> midiFile, MetaMidiStream stream)
         {
             MidiFile convertedData = new MidiFile(stream, DecodeMidi(midiFile), BUFFER_SIZE);
-            
+
 
             return convertedData;
         }
 
-        public List<IMessage> DecodeMidi(List<byte> midiFile)
+        public List<AbstractMessage> DecodeMidi(List<byte> midiFile)
         {
-            List<IMessage> decodedEventList = new List<IMessage>();
+            List<AbstractMessage> decodedEventList = new List<AbstractMessage>();
             int chunkSize = 1;
 
             if (midiFile.Count() < 4)
@@ -54,10 +54,11 @@ namespace uMIDI.IO
                 chunkSize = bodySize + TRACK_CHUNK.Count() + chunkBodyLengthSize;
                 decodedEventList = decodedEventList.Concat(ProcessTrackChunk(midiFile.GetRange(TRACK_CHUNK.Count() + chunkBodyLengthSize, bodySize))).ToList();
             }
-            
-            if (midiFile.Count() > chunkSize) {
+
+            if (midiFile.Count() > chunkSize)
+            {
                 return decodedEventList.Concat(DecodeMidi(midiFile.GetRange(chunkSize, decodedEventList.Count() - 1))).ToList();
-            } 
+            }
             else
             {
                 return decodedEventList;
@@ -80,18 +81,18 @@ namespace uMIDI.IO
         /// </summary>
         /// <param name="chunkIdentifier">A <see cref="List{T}"/> of four hexadecimal bytes.</param>
         /// <returns>true if header chunk; else false.</returns>
-         private bool IsHeaderChunk(List<byte> chunkIdentifier)
+        private bool IsHeaderChunk(List<byte> chunkIdentifier)
         {
             return chunkIdentifier.SequenceEqual(HEADER_CHUNK);
         }
 
 
         /// <summary>
-        /// Converts from the hexadecimal bytes from the header chunk into a <see cref="IMessage"/>.
+        /// Converts from the hexadecimal bytes from the header chunk into a <see cref="AbstractMessage"/>.
         /// </summary>
         /// <param name="headerChunkBody">A <see cref="List{T}"/> of hexadecimal bytes that represent the header's body.</param>
-        /// <returns>A <see cref="List"/> containing a single <see cref="IMessage"/>.</returns>
-        private IMessage ProcessHeaderChunk(List<byte> headerChunkBody)
+        /// <returns>A <see cref="List"/> containing a single <see cref="AbstractMessage"/>.</returns>
+        private AbstractMessage ProcessHeaderChunk(List<byte> headerChunkBody)
         {
             /*
             return new HeaderEvent()
@@ -117,11 +118,11 @@ namespace uMIDI.IO
         {
             int formatKey = ConcatBytes(formatInfo.GetRange(0, 2));
             string formatValue;
-            
+
             if (FORMATS.TryGetValue(formatKey, out formatValue))
             {
                 return formatValue;
-            } 
+            }
             else
             {
                 // TODO: Maybe throw an exception here instead?
@@ -167,13 +168,13 @@ namespace uMIDI.IO
         }
 
         /// <summary>
-        /// Converts from the hexadecimal bytes from the track chunk into a <see cref="List"/> of <see cref="IMessage"/>s.
+        /// Converts from the hexadecimal bytes from the track chunk into a <see cref="List"/> of <see cref="AbstractMessage"/>s.
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
-        /// <returns>A <see cref="List"/> of <see cref="IMessage"/>s that represent the information from the track chunk.</returns>
-        private List<IMessage> ProcessTrackChunk(List<byte> trackChunk)
+        /// <returns>A <see cref="List"/> of <see cref="AbstractMessage"/>s that represent the information from the track chunk.</returns>
+        private List<AbstractMessage> ProcessTrackChunk(List<byte> trackChunk)
         {
-            List<IMessage> decodedEventList = new List<IMessage>();
+            List<AbstractMessage> decodedEventList = new List<AbstractMessage>();
             bool endOfTrack = false;
 
             while (!endOfTrack)
@@ -242,11 +243,11 @@ namespace uMIDI.IO
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <param name="deltaTime">The time between the previous event and the current event.</param>
-        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="IMessage"/> information and the number of bytes the meta event was.</returns>
+        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="AbstractMessage"/> information and the number of bytes the meta event was.</returns>
         private TrackMetaEventInfo ProcessMetaEvent(List<byte> trackChunk, int deltaTime)
         {
             int eventSize = trackChunk[2];
-            IMessage metaEvent = null;                                  //TODO: need to find a better way to handle this
+            AbstractMessage metaEvent = null;                                  //TODO: need to find a better way to handle this
             String eventType = metaEventCodeDictionary[trackChunk[1]];
 
             byte[] data = new byte[eventSize];
@@ -261,7 +262,7 @@ namespace uMIDI.IO
                 Data = data
             };
 
-            IMetaMessage metaMessage = IMessageUtility.ToIMetaMessage(message, deltaTime);
+            AbstractMetaMessage metaMessage =  MMessageUtility.ToIMetaMessage(message, deltaTime);
             /*
             switch (eventType)
             {
@@ -288,7 +289,7 @@ namespace uMIDI.IO
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <param name="deltaTime">The time between the previous event and the current event.</param>
-        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="IMessage"/> information and the number of bytes the meta event was.</returns>
+        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="AbstractMessage"/> information and the number of bytes the meta event was.</returns>
         private TrackMetaEventInfo ProcessTrackEvent(List<byte> trackChunk, int deltaTime)
         {
             string trackEventType = trackEventStatusDictionary[trackChunk[0]];
@@ -346,7 +347,7 @@ namespace uMIDI.IO
             }
 
             //public method for testing ProcessHeaderChunk
-            public IMessage TestProcessHeaderChunk(List<byte> headerChunkBody)
+            public AbstractMessage TestProcessHeaderChunk(List<byte> headerChunkBody)
             {
 
                 return instance.ProcessHeaderChunk(headerChunkBody);
@@ -387,7 +388,7 @@ namespace uMIDI.IO
             }
 
             //public method for Unit testing
-            public List<IMessage> TestProcessTrackChunk(List<byte> trackChunk)
+            public List<AbstractMessage> TestProcessTrackChunk(List<byte> trackChunk)
             {
                 return instance.ProcessTrackChunk(trackChunk);
             }
