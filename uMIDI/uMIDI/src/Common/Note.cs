@@ -3,6 +3,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace uMIDI.Common
 {
+    /// <summary>
+    /// Represents a note with a channel, pitch, and velocity. There are 16
+    /// possible channels, 128 possible pitches, and 128 possible velocity
+    /// values.
+    /// </summary>
     public class Note : IEquatable<Note>
     {
         public byte Channel { get; set; }
@@ -15,7 +20,15 @@ namespace uMIDI.Common
             Pitch = pitch;
             Velocity = velocity;
         }
-        
+
+        /// <summary>
+        /// Returns a new <see cref="Note"/> object transposed by a given
+        /// interval.
+        /// </summary>
+        /// <param name="interval">Number of semitones by which the
+        /// transposition is performed. Positive values represent an increase
+        /// in pitch, and vice versa.</param>
+        /// <returns>A new <see cref="Note"/> object.</returns>
         public Note Transpose(byte interval)
         {
             int newPitch = Pitch + interval;
@@ -26,6 +39,10 @@ namespace uMIDI.Common
             return new Note(Channel, (byte) newPitch, Velocity);
         }
 
+        /// <summary>
+        /// Returns the note name as a string. Only returns sharps.
+        /// </summary>
+        /// <returns></returns>
         public string Name()
         {
             string noteName;
@@ -90,6 +107,10 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// Represents a key signature: a tonic center, and a scale (currently only
+    /// the major scale and natural minor scale are supported.)
+    /// </summary>
     public class KeySignature : IEquatable<KeySignature>
     {
         public Tonic Tonic { get; set; }
@@ -107,6 +128,9 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// Enum of the 12-tone chromatic scale. Enharmonic notes are not supported.
+    /// </summary>
     public enum Tonic
     {
         C = 0,
@@ -123,11 +147,19 @@ namespace uMIDI.Common
         B = 11
     }
 
+    /// <summary>
+    /// Enum of scales. Currently only the major and natural minor scales are
+    /// supported.
+    /// </summary>
     public enum Scale
     {
         MAJOR, MINOR
     }
 
+    /// <summary>
+    /// Enum representing interval names and the associated difference in pitch
+    /// in semitones.
+    /// </summary>
     public enum Interval
     {
         UNISON = 0,

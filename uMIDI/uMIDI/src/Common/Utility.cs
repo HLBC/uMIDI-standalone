@@ -2,10 +2,19 @@
 
 namespace uMIDI.Common
 {
+    /// <summary>
+    /// Class of utility functions.
+    /// </summary>
     public class MessageUtility
     {
         private MessageUtility() { }
 
+        /// <summary>
+        /// Converts a MidiMessage struct of byte data to an IMessage object.
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="timeDelta"></param>
+        /// <returns></returns>
         public static IMessage ToIMessage(MidiMessage msg, long timeDelta)
         {
             if (0x80 <= msg.Status && msg.Status < 0x90)
@@ -37,6 +46,13 @@ namespace uMIDI.Common
             }
         }
 
+        /// <summary>
+        /// Converts a MetaMessage struct of byte data to an IMetaMessage
+        /// object.
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="timeDelta"></param>
+        /// <returns></returns>
         public static IMetaMessage ToIMetaMessage(MetaMessage msg,
             long timeDelta)
         {

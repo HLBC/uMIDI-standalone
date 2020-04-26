@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace uMIDI.Common
 {
+    /// <summary>
+    /// Enum for meta type codes for midi meta events.
+    /// </summary>
     public enum MetaType
     {
         TEMPO = 0x51,
@@ -12,6 +15,9 @@ namespace uMIDI.Common
         KEY_SIGNATURE = 0x59
     }
 
+    /// <summary>
+    /// Struct containing byte data for a MIDI meta message.
+    /// </summary>
     public struct MetaMessage : IEquatable<MetaMessage>
     {
         public byte MetaType;
@@ -32,15 +38,28 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// Interface for MIDI meta messages
+    /// </summary>
     public interface IMetaMessage : IMessage
     {
+        /// <summary>
+        /// Implement this method to return the byte data
+        /// </summary>
         MetaMessage MetaMessage { get; }
     }
 
+    /// <summary>
+    /// Implementation of IMetaMessage. MetaMessage classes should extend this
+    /// class.
+    /// </summary>
     public abstract class AbstractMetaMessage : AbstractMessage, IMetaMessage
     {
         public abstract MetaMessage MetaMessage { get; }
 
+        /// <summary>
+        /// Converts to a normal MidiMessage struct object.
+        /// </summary>
         public override MidiMessage Message
         {
             get
@@ -61,6 +80,9 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// Tempo change meta message.
+    /// </summary>
     public class TempoMetaMessage : AbstractMetaMessage
     {
         // Tempo in *quarter notes* per minute
@@ -96,6 +118,9 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// Time signature change meta message.
+    /// </summary>
     public class TimeSignatureMetaMessage : AbstractMetaMessage
     {
 
@@ -144,6 +169,9 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// Key signature change meta message.
+    /// </summary>
     public class KeySignatureMetaMessage : AbstractMetaMessage
     {
         public override long TimeDelta { get; }

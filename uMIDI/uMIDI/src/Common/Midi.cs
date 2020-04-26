@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace uMIDI.Common
 {
+    /// <summary>
+    /// Struct containing byte data for a MIDI message. (Just a status byte,
+    /// array of data bytes, and time delta).
+    /// </summary>
     public struct MidiMessage : IEquatable<MidiMessage>
     {
         public byte Status;
@@ -32,12 +36,20 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// Interface wrapper for MidiMessages.
+    /// </summary>
     public interface IMessage : IEquatable<IMessage>
     {
         MidiMessage Message { get; }
         long TimeDelta { get; }
     }
 
+    /// <summary>
+    /// Abstract implementation of IMessage. MidiMessage classes should extend
+    /// this class. Default Equals() method defines equality as Message and
+    /// TimeDelta properties being equal.
+    /// </summary>
     public abstract class AbstractMessage : IMessage
     {
         public abstract MidiMessage Message { get; }
@@ -51,6 +63,9 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// "note off" MIDI message.
+    /// </summary>
     public class NoteOffMessage : AbstractMessage
     {
         public Note Note { get; }
@@ -77,6 +92,9 @@ namespace uMIDI.Common
         }
     }
 
+    /// <summary>
+    /// "note on" MIDI message.
+    /// </summary>
     public class NoteOnMessage : AbstractMessage
     {
         public Note Note { get; }
