@@ -30,13 +30,12 @@ namespace uMIDI.Common
     {
         public Note Note { get; }
 
-        public long TimeDelta {
-            get => Note.Time;
-        }
+        public long TimeDelta { get; }
 
-        public NoteOffMessage(Note note)
+        public NoteOffMessage(Note note, long timeDelta)
         {
             Note = note;
+            TimeDelta = timeDelta;
         }
 
         public MidiMessage Message
@@ -57,11 +56,12 @@ namespace uMIDI.Common
     {
         public Note Note { get; }
 
-        public long TimeDelta { get => Note.Time; }
+        public long TimeDelta { get; }
 
-        public NoteOnMessage(Note note)
+        public NoteOnMessage(Note note, long timeDelta)
         {
             Note = note;
+            TimeDelta = timeDelta;
         }
 
         public MidiMessage Message

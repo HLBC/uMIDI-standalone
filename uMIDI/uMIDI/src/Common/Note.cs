@@ -8,14 +8,11 @@ namespace uMIDI.Common
         public byte Pitch { get; set; }
         public byte Velocity { get; set; }
 
-        public long Time { get; set; }
-
-        public Note(byte channel, byte pitch, byte velocity, long time)
+        public Note(byte channel, byte pitch, byte velocity)
         {
             Channel = channel;
             Pitch = pitch;
             Velocity = velocity;
-            Time = time;
         }
         
         public Note Transpose(byte interval)
@@ -25,7 +22,7 @@ namespace uMIDI.Common
             {
                 throw new ArgumentException("Resulting pitch is too high/low!");
             }
-            return new Note(Channel, (byte) newPitch, Velocity, Time);
+            return new Note(Channel, (byte) newPitch, Velocity);
         }
 
         public string Name()
