@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using uMIDI.Common;
-using uMIDI.Transform;
 
 namespace uMIDI.IO
 {
@@ -8,7 +7,7 @@ namespace uMIDI.IO
     {
         public MidiStreamState State { get; }
         private ISet<IMidiInstrument> instruments;
-        private LinkedList<AbstractMessage> buffer;
+        private LinkedList<IMessage> buffer;
         private int bufferCount;
 
         public MidiStream(int ticksPerBeat)
@@ -23,20 +22,20 @@ namespace uMIDI.IO
             instruments.Add(instrument);
         }
 
-        public void PushBuffer(AbstractMessage[] messages)
+        public void PushBuffer(IMessage[] messages)
         {
             // Add messages to buffer
-            foreach (AbstractMessage message in messages)
+            foreach (IMessage message in messages)
             {
                 buffer.AddLast(message);
                 bufferCount++;
             }
         }
 
-        public void PushBuffer(LinkedList<AbstractMessage> messages)
+        public void PushBuffer(LinkedList<IMessage> messages)
         {
             // Add messages to buffer
-            foreach (AbstractMessage message in messages)
+            foreach (IMessage message in messages)
             {
                 buffer.AddLast(message);
                 bufferCount++;
@@ -52,8 +51,8 @@ namespace uMIDI.IO
         public void Update()
         {
             // Call ProcessMidi and clear buffer
-            AbstractMessage[] bufferArr = new AbstractMessage[bufferCount];
-            LinkedListNode<AbstractMessage> msg = buffer.First;
+            IMessage[] bufferArr = new IMessage[bufferCount];
+            LinkedListNode<IMessage> msg = buffer.First;
             for (int i = 0; i < bufferCount; i++)
             {
                 bufferArr[i] = msg.Value;
@@ -65,7 +64,7 @@ namespace uMIDI.IO
                 inst.ProcessMidi(bufferArr);
             }
 
-            buffer = new LinkedList<AbstractMessage>();
+            buffer = new LinkedList<IMessage>();
         }
     }
 }

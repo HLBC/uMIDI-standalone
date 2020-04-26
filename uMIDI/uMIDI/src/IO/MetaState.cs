@@ -1,4 +1,6 @@
-﻿namespace uMIDI.IO
+﻿using uMIDI.Common;
+
+namespace uMIDI.IO
 {
     public class MetaState
     {
@@ -6,6 +8,7 @@
         // Subdivision power of 2 (1 - half note (2), 2 - quarter note (4), etc)
         public int Subdivision { get; set; }
         public int BPM { get; set; }
+        public KeySignature KeySignature { get; set; }
         public MetaState(int beatsPerMeasure, int subdivision, int bpm)
         {
             BeatsPerMeasure = beatsPerMeasure;
