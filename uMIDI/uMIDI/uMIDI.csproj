@@ -10,7 +10,8 @@
       <Folder Include="src\Transform\" />
     </ItemGroup>
     <ItemGroup>
-      <Compile Include=".gitignore" />
+      <Compile Remove="tests\PrintInstrument.cs" />
+      <Compile Remove=".gitignore" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="MSTest.TestFramework" Version="2.1.1" />

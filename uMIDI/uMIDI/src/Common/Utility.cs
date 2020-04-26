@@ -37,7 +37,7 @@ namespace uMIDI.Common
             }
         }
 
-        public static IMetaMessage ToMetaMessage(MetaMessage msg,
+        public static IMetaMessage ToIMetaMessage(MetaMessage msg,
             long timeDelta)
         {
             switch (msg.MetaType)

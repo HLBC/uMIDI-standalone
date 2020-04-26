@@ -262,7 +262,7 @@ namespace uMIDI.IO
                 Data = data
             };
 
-            AbstractMetaMessage metaMessage =  MMessageUtility.ToIMetaMessage(message, deltaTime);
+            IMetaMessage metaMessage = MessageUtility.ToIMetaMessage(message, deltaTime);
             /*
             switch (eventType)
             {
