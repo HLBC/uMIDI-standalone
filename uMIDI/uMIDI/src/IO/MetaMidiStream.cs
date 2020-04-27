@@ -34,7 +34,7 @@ namespace uMIDI.IO
 
             foreach (ITransform transform in Transforms)
             {
-                region = transform.Apply(region);
+                transform.Apply(region);
             }
 
             (IMessage[] newBuffer, MetaState newState) = Region.Region2Messages(
