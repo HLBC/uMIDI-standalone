@@ -30,9 +30,9 @@ namespace uMIDI.IO
 
         #region --Functions--
 
-        public MidiFile ConvertMidi(List<byte> midiData, MetaMidiStream stream)
+        public MidiFile ConvertMidi(List<byte> midiData)
         {
-            MidiFile convertedData = new MidiFile(stream, DecodeMidi(midiData), BUFFER_SIZE);
+            MidiFile convertedData = new MidiFile(BUFFER_SIZE, ticksPerBeat, DecodeMidi(midiData));
 
 
             return convertedData;
