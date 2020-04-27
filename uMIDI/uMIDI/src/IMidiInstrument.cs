@@ -4,6 +4,6 @@ namespace uMIDI
 {
     public interface IMidiInstrument
     {
-        void ProcessMidi(AbstractMessage[] messages);
+        void ProcessMidi(IMessage[] messages);
     }
 }

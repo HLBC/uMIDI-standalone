@@ -34,8 +34,7 @@ namespace uMIDI.Transform
 
         public Region(List<TimedNote> notes, MetaState state)
         {
-            _notes = notes.OrderBy(o => !o.StartTime.HasValue)
-                .ThenBy(o => o.StartTime.Value).ToList();
+            _notes = notes.OrderBy(o => o.StartTime).ToList();
             State = state;
         }
 
@@ -182,7 +181,7 @@ namespace uMIDI.Transform
 
         public bool Equals([AllowNull] Region other)
         {
-            return _notes.Equals(other._notes);
+            return Enumerable.SequenceEqual(_notes, other._notes);
         }
 
         public IEnumerator<TimedNote> GetEnumerator()
@@ -222,25 +221,14 @@ namespace uMIDI.Transform
 
         public bool Equals([AllowNull] TimedNote other)
         {
-            throw new NotImplementedException();
+            return base.Equals(other) && StartTime == other.StartTime
+                && EndTime == other.EndTime;
         }
 
-        /// <summary>
-        /// Converts to a <see cref="NoteOnMessage"/> and
-        /// <see cref="NoteOffMessage"/>. Note that the time deltas for each
-        /// message must be passed in, as other events can influence the exact
-        /// values (such as multiple notes being held at once).
-        /// </summary>
-        /// <param name="onTimeDelta"></param>
-        /// <param name="offTimeDelta"></param>
-        /// <returns></returns>
-        public (NoteOnMessage, NoteOffMessage) ToMessages(long onTimeDelta,
-            long offTimeDelta)
+        public override string ToString()
         {
-            return (
-                new NoteOnMessage(this, onTimeDelta),
-                new NoteOffMessage(this, offTimeDelta)
-                );
+            return String.Format("(Note {2} {0} ({1}) {3} Start: {4} End: {5})",
+                Pitch, Name(), Channel, Velocity, StartTime, EndTime);
         }
     }
 }

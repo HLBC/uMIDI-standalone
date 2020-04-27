@@ -16,6 +16,7 @@
   <ItemGroup>
     <Folder Include="Common\" />
     <Folder Include="IO\" />
+    <Folder Include="Transform\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\uMIDI\uMIDI.csproj" />
