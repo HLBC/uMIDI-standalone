@@ -7,11 +7,11 @@ namespace uMIDI.IO
 
         public int TicksPerBeat { get; set; }
 
-        public long CurrentBeat
+        public double CurrentBeat
         {
             get
             {
-                return CurrentTick / TicksPerBeat;
+                return (double) CurrentTick / TicksPerBeat;
             }
         }
 
@@ -29,6 +29,11 @@ namespace uMIDI.IO
                     "Advance() must have positive argument");
             }
             CurrentTick += amount;
+        }
+
+        public long Beat2Tick(double beat)
+        {
+            return (long) (beat * TicksPerBeat);
         }
     }
 }
