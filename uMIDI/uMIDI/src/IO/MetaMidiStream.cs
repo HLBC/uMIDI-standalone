@@ -10,6 +10,7 @@ namespace uMIDI.IO
         public MetaState MetaState { get; private set; }
         public MidiStream MidiStream { get; }
         public List<ITransform> Transforms { get; set; }
+        public MidiClock Clock { get => MidiStream.State.Clock; }
 
         public MetaMidiStream(int ticksPerBeat, int beatsPerMeasure,
             int subdivision, int bpm, KeySignature key)
@@ -21,16 +22,8 @@ namespace uMIDI.IO
 
         public void PushBuffer(IMessage[] messages)
         {
-            // Add messages to buffer, applying transformations
-            LinkedList<IMessage> buffer = new LinkedList<IMessage>();
-
-            foreach (IMessage message in messages)
-            {
-                buffer.AddLast(message);
-            }
-
             // Convert to region
-            Region region = Region.Messages2Region(buffer, MetaState);
+            Region region = Region.Messages2Region(messages, MetaState);
 
             foreach (ITransform transform in Transforms)
             {
