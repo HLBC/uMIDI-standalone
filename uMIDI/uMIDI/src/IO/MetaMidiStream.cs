@@ -12,9 +12,9 @@ namespace uMIDI.IO
         public List<ITransform> Transforms { get; set; }
 
         public MetaMidiStream(int ticksPerBeat, int beatsPerMeasure,
-            int subdivision, int bpm)
+            int subdivision, int bpm, KeySignature key)
         {
-            MetaState = new MetaState(beatsPerMeasure, subdivision, bpm);
+            MetaState = new MetaState(beatsPerMeasure, subdivision, bpm, key);
             MidiStream = new MidiStream(ticksPerBeat);
             Transforms = new List<ITransform>();
         }
@@ -34,7 +34,7 @@ namespace uMIDI.IO
 
             foreach (ITransform transform in Transforms)
             {
-                region = transform.Apply(region);
+                transform.Apply(region);
             }
 
             (IMessage[] newBuffer, MetaState newState) = Region.Region2Messages(
