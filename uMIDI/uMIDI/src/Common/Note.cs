@@ -10,9 +10,54 @@ namespace uMIDI.Common
     /// </summary>
     public class Note : IEquatable<Note>
     {
-        public byte Channel { get; set; }
-        public byte Pitch { get; set; }
-        public byte Velocity { get; set; }
+        public byte Channel
+        {
+            get => Channel;
+            set
+            {
+                if (value < 16 && value >= 0)
+                {
+                    Channel = value;
+                }
+                else
+                {
+                    throw new ArgumentException(
+                        "Channel must be between 0 and 15");
+                }
+            }
+        }
+
+        public byte Pitch {
+            get => Pitch;
+            set
+            {
+                if (value < 128 && value >= 0)
+                {
+                    Pitch = value;
+                }
+                else
+                {
+                    throw new ArgumentException(
+                        "Channel must be between 0 and 127");
+                }
+            }
+        }
+
+        public byte Velocity {
+            get => Velocity;
+            set
+            {
+                if (value < 128 && value >= 0)
+                {
+                    Velocity = value;
+                }
+                else
+                {
+                    throw new ArgumentException(
+                        "Velocity must be between 0 and 127");
+                }
+            }
+        }
 
         public Note(byte channel, byte pitch, byte velocity)
         {
