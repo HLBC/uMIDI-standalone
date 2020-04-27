@@ -74,7 +74,7 @@ namespace uMIDI.Common
                 {
                     Status = 0xff,
                     Data = data,
-                    TimeDelta = TimeDelta
+                    TimeDelta = MetaMessage.TimeDelta
                 };
             }
         }
