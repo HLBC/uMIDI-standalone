@@ -12,6 +12,20 @@ namespace uMIDI.IO
         public List<ITransform> Transforms { get; set; }
         public MidiClock Clock { get => MidiStream.State.Clock; }
 
+        public MetaMidiStream()
+        {
+            MetaState = new MetaState();
+            MidiStream = new MidiStream();
+            Transforms = new List<ITransform>();
+        }
+
+        public MetaMidiStream(int ticksPerBeat)
+        {
+            MetaState = new MetaState();
+            MidiStream = new MidiStream(ticksPerBeat);
+            Transforms = new List<ITransform>();
+        }
+
         public MetaMidiStream(int ticksPerBeat, int beatsPerMeasure,
             int subdivision, int bpm, KeySignature key)
         {

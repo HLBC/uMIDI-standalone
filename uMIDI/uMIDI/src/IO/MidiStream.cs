@@ -10,6 +10,11 @@ namespace uMIDI.IO
         private LinkedList<IMessage> buffer;
         private int bufferCount;
 
+        public MidiStream() : this(48)
+        {
+
+        }
+
         public MidiStream(int ticksPerBeat)
         {
             State = new MidiStreamState(ticksPerBeat);

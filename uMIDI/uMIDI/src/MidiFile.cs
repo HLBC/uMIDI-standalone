@@ -17,6 +17,13 @@ namespace uMIDI
         private IMessage[] _buffer;
         private IMessage[] _lastbuffer;
 
+        public MidiFile(int bufferSize, int ticksPerBeat) :
+            this (new MetaMidiStream(ticksPerBeat), new List<IMessage>(),
+                bufferSize)
+        {
+
+        }
+
         public MidiFile(MetaMidiStream stream, List<IMessage> messages,
             int bufferSize)
         {

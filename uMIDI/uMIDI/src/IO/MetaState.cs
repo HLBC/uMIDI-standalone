@@ -10,6 +10,11 @@ namespace uMIDI.IO
         public int BPM { get; set; }
         public KeySignature KeySignature { get; set; }
 
+        public MetaState() : this(4, 2, 120,
+            new KeySignature(Tonic.C, Scale.MAJOR))
+        {
+        }
+
         public MetaState(int beatsPerMeasure, int subdivision, int bpm,
             KeySignature key)
         {
