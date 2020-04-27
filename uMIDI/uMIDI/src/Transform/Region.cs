@@ -53,10 +53,10 @@ namespace uMIDI.Transform
             return notes.ToArray();
         }
 
-        public static Region Messages2Region(LinkedList<IMessage> buffer,
+        public static Region Messages2Region(IMessage[] buffer,
             MetaState state)
         {
-            List<TimedNote> notes = new List<TimedNote>(buffer.Count);
+            List<TimedNote> notes = new List<TimedNote>(buffer.Length);
             Dictionary<byte, TimedNote> notesOn
                 = new Dictionary<byte, TimedNote>();
             long currentTime = 0;
