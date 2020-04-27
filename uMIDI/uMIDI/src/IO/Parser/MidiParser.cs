@@ -24,40 +24,40 @@ namespace uMIDI.IO
 
         #region --Functions--
 
-        public MidiFile ConvertMidi(List<byte> midiFile, MetaMidiStream stream)
+        public MidiFile ConvertMidi(List<byte> midiData, MetaMidiStream stream)
         {
-            MidiFile convertedData = new MidiFile(stream, DecodeMidi(midiFile), BUFFER_SIZE);
+            MidiFile convertedData = new MidiFile(stream, DecodeMidi(midiData), BUFFER_SIZE);
 
 
             return convertedData;
         }
 
-        public List<AbstractMessage> DecodeMidi(List<byte> midiFile)
+        public List<AbstractMessage> DecodeMidi(List<byte> midiData)
         {
             List<AbstractMessage> decodedEventList = new List<AbstractMessage>();
             int chunkSize = 1;
 
-            if (midiFile.Count() < 4)
+            if (midiData.Count() < 4)
             {
                 return decodedEventList;         //ERROR: If the code reaches here, there were extra bytes left over that weren't covered by any type of chunk.
             }
 
-            if (IsHeaderChunk(midiFile.GetRange(0, 4)))
+            if (IsHeaderChunk(midiData.GetRange(0, 4)))
             {
-                int bodySize = FindChunkBodyLength(midiFile.GetRange(4, 4));
+                int bodySize = FindChunkBodyLength(midiData.GetRange(4, 4));
                 chunkSize = bodySize + HEADER_CHUNK.Count() + chunkBodyLengthSize;
-                decodedEventList.Add(ProcessHeaderChunk(midiFile.GetRange(HEADER_CHUNK.Count() + chunkBodyLengthSize, bodySize)));
+                ProcessHeaderChunk(midiData.GetRange(HEADER_CHUNK.Count() + chunkBodyLengthSize, bodySize));
             }
-            else if (IsTrackChunk(midiFile.GetRange(0, 4)))
+            else if (IsTrackChunk(midiData.GetRange(0, 4)))
             {
-                int bodySize = FindChunkBodyLength(midiFile.GetRange(4, 4));
+                int bodySize = FindChunkBodyLength(midiData.GetRange(4, 4));
                 chunkSize = bodySize + TRACK_CHUNK.Count() + chunkBodyLengthSize;
-                decodedEventList = decodedEventList.Concat(ProcessTrackChunk(midiFile.GetRange(TRACK_CHUNK.Count() + chunkBodyLengthSize, bodySize))).ToList();
+                decodedEventList = decodedEventList.Concat(ProcessTrackChunk(midiData.GetRange(TRACK_CHUNK.Count() + chunkBodyLengthSize, bodySize))).ToList();
             }
 
-            if (midiFile.Count() > chunkSize)
+            if (midiData.Count() > chunkSize)
             {
-                return decodedEventList.Concat(DecodeMidi(midiFile.GetRange(chunkSize, decodedEventList.Count() - 1))).ToList();
+                return decodedEventList.Concat(DecodeMidi(midiData.GetRange(chunkSize, decodedEventList.Count() - 1))).ToList();
             }
             else
             {
@@ -94,6 +94,8 @@ namespace uMIDI.IO
         /// <returns>A <see cref="List"/> containing a single <see cref="AbstractMessage"/>.</returns>
         private AbstractMessage ProcessHeaderChunk(List<byte> headerChunkBody)
         {
+
+            
             /*
             return new HeaderEvent()
             {
@@ -247,14 +249,8 @@ namespace uMIDI.IO
         private TrackMetaEventInfo ProcessMetaEvent(List<byte> trackChunk, int deltaTime)
         {
             int eventSize = trackChunk[2];
-            AbstractMessage metaEvent = null;                                  //TODO: need to find a better way to handle this
-            String eventType = metaEventCodeDictionary[trackChunk[1]];
 
-            byte[] data = new byte[eventSize];
-            for (int i = 0; i < eventSize; i++)
-            {
-                data[i] = trackChunk[2 + i];
-            }
+            byte[] data = trackChunk.GetRange(3, eventSize).ToArray();
 
             MetaMessage message = new MetaMessage
             {
@@ -263,29 +259,16 @@ namespace uMIDI.IO
             };
 
             IMetaMessage metaMessage = MessageUtility.ToIMetaMessage(message, deltaTime);
-            /*
-            switch (eventType)
-            {
-                case "tempo setting":
-                    metaEvent = new TempoMetaMessage()
-                    {
-                        Tempo = string.Join("", trackChunk.GetRange(3, eventSize)),
-                        Time = deltaTime
-                    };
-                    break;
-                // TODO: Add all the meta message cases
-            }
-            */
 
             return new TrackMetaEventInfo
             {
                 eventSize = eventSize,
-                trackOrMetaEvent = metaEvent
+                trackOrMetaEvent = metaMessage
             };
         }
 
         /// <summary>
-        /// Converts from the hexadecimal bytes of a trac event into a <see cref="TrackMetaEventInfo"/>.
+        /// Converts from the hexadecimal bytes of a track event into a <see cref="TrackMetaEventInfo"/>.
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <param name="deltaTime">The time between the previous event and the current event.</param>
@@ -294,33 +277,27 @@ namespace uMIDI.IO
         {
             string trackEventType = trackEventStatusDictionary[trackChunk[0]];
 
+            byte[] data = trackChunk.GetRange(1, 2).ToArray();
 
-
-            /*
-            if (trackEventType == "note on")
+            MidiMessage message = new MidiMessage
             {
-                IMessage trackEvent = new NoteOnMessage()
-                {
-                    Note = new Note()
-                    {
-                        Channel = BitByBit.Nib2Hex(BitByBit.RightNib(trackChunk[0])),
-                        Pitch = trackChunk[1],
-                        Velocity = trackChunk[2],
-                        Time = deltaTime
-                    }
-                };
-            } else if (track)
-                
+                Status = trackChunk[0],
+                TimeDelta = deltaTime,
+                Data = data
+            };
+
+            IMessage midiMessage = MessageUtility.ToIMessage(message, deltaTime);
 
             return new TrackMetaEventInfo
             {
                 eventSize = 3,
-                trackOrMetaEvent = trackEvent
-            };*/
-            return null;
+                trackOrMetaEvent = midiMessage
+            };
         }
         #endregion
+
         #region --Test Hooks--
+
         public class TestHook
         {
             private MidiParser instance;
