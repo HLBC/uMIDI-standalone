@@ -22,6 +22,12 @@ namespace uMIDI.IO
 
         #endregion
 
+        #region --Fields--
+
+        private int ticksPerBeat;
+
+        #endregion
+
         #region --Functions--
 
         public MidiFile ConvertMidi(List<byte> midiData, MetaMidiStream stream)
@@ -92,10 +98,10 @@ namespace uMIDI.IO
         /// </summary>
         /// <param name="headerChunkBody">A <see cref="List{T}"/> of hexadecimal bytes that represent the header's body.</param>
         /// <returns>A <see cref="List"/> containing a single <see cref="AbstractMessage"/>.</returns>
-        private AbstractMessage ProcessHeaderChunk(List<byte> headerChunkBody)
+        private void ProcessHeaderChunk(List<byte> headerChunkBody)
         {
+            ticksPerBeat = FindUnitForDeltaTiming(HeaderPartChunk(headerChunkBody, "unitForDeltaTiming"));
 
-            
             /*
             return new HeaderEvent()
             {
@@ -103,7 +109,7 @@ namespace uMIDI.IO
                 NumberOfTracks = FindNumberOfTracks(HeaderPartChunk(headerChunkBody, "numberOfTracks")),
                 UnitForDeltaTiming = FindUnitForDeltaTiming(HeaderPartChunk(headerChunkBody, "unitForDeltaTiming"))
             };*/
-            return null;
+            //return null;
         }
 
         private List<byte> HeaderPartChunk(List<byte> body, string partName)
@@ -324,10 +330,10 @@ namespace uMIDI.IO
             }
 
             //public method for testing ProcessHeaderChunk
-            public AbstractMessage TestProcessHeaderChunk(List<byte> headerChunkBody)
+            public void TestProcessHeaderChunk(List<byte> headerChunkBody)
             {
 
-                return instance.ProcessHeaderChunk(headerChunkBody);
+                instance.ProcessHeaderChunk(headerChunkBody);
             }
 
             //public method for Unit testing HeaderPartChunk
