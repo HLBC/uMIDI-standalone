@@ -7,7 +7,7 @@ namespace uMIDI.IO
 {
     public class TrackMetaEventInfo
     {
-        public AbstractMessage trackOrMetaEvent { get; set; }
+        public IMessage trackOrMetaEvent { get; set; }
         public int eventSize { get; set; }
     }
 }

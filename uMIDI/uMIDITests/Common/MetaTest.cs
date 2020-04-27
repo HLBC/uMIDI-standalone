@@ -25,7 +25,7 @@ namespace uMIDITests.Common
                 TimeDelta = 0
             };
 
-            Assert.True(bytes.Equals(expected));
+            Assert.Equal(expected, bytes);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace uMIDITests.Common
                 TimeDelta = 0
             };
 
-            Assert.True(bytes.Equals(expected));
+            Assert.Equal(expected, bytes);
         }
 
         [Fact]
@@ -84,8 +84,8 @@ namespace uMIDITests.Common
                 TimeDelta = 0
             };
 
-            Assert.True(bytes1.Equals(expected));
-            Assert.True(bytes2.Equals(expected));
+            Assert.Equal(expected, bytes1);
+            Assert.Equal(expected, bytes2);
         }
     }
 }

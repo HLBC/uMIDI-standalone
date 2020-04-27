@@ -38,9 +38,9 @@ namespace uMIDI.IO
             return convertedData;
         }
 
-        public List<AbstractMessage> DecodeMidi(List<byte> midiData)
+        public List<IMessage> DecodeMidi(List<byte> midiData)
         {
-            List<AbstractMessage> decodedEventList = new List<AbstractMessage>();
+            List<IMessage> decodedEventList = new List<IMessage>();
             int chunkSize = 1;
 
             if (midiData.Count() < 4)
@@ -94,10 +94,10 @@ namespace uMIDI.IO
 
 
         /// <summary>
-        /// Converts from the hexadecimal bytes from the header chunk into a <see cref="AbstractMessage"/>.
+        /// Converts from the hexadecimal bytes from the header chunk into a <see cref="IMessage"/>.
         /// </summary>
         /// <param name="headerChunkBody">A <see cref="List{T}"/> of hexadecimal bytes that represent the header's body.</param>
-        /// <returns>A <see cref="List"/> containing a single <see cref="AbstractMessage"/>.</returns>
+        /// <returns>A <see cref="List"/> containing a single <see cref="IMessage"/>.</returns>
         private void ProcessHeaderChunk(List<byte> headerChunkBody)
         {
             ticksPerBeat = FindUnitForDeltaTiming(HeaderPartChunk(headerChunkBody, "unitForDeltaTiming"));
@@ -176,13 +176,13 @@ namespace uMIDI.IO
         }
 
         /// <summary>
-        /// Converts from the hexadecimal bytes from the track chunk into a <see cref="List"/> of <see cref="AbstractMessage"/>s.
+        /// Converts from the hexadecimal bytes from the track chunk into a <see cref="List"/> of <see cref="IMessage"/>s.
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
-        /// <returns>A <see cref="List"/> of <see cref="AbstractMessage"/>s that represent the information from the track chunk.</returns>
-        private List<AbstractMessage> ProcessTrackChunk(List<byte> trackChunk)
+        /// <returns>A <see cref="List"/> of <see cref="IMessage"/>s that represent the information from the track chunk.</returns>
+        private List<IMessage> ProcessTrackChunk(List<byte> trackChunk)
         {
-            List<AbstractMessage> decodedEventList = new List<AbstractMessage>();
+            List<IMessage> decodedEventList = new List<IMessage>();
             bool endOfTrack = false;
 
             while (!endOfTrack)
@@ -251,7 +251,7 @@ namespace uMIDI.IO
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <param name="deltaTime">The time between the previous event and the current event.</param>
-        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="AbstractMessage"/> information and the number of bytes the meta event was.</returns>
+        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="IMessage"/> information and the number of bytes the meta event was.</returns>
         private TrackMetaEventInfo ProcessMetaEvent(List<byte> trackChunk, int deltaTime)
         {
             int eventSize = trackChunk[2];
@@ -278,7 +278,7 @@ namespace uMIDI.IO
         /// </summary>
         /// <param name="trackChunk">A <see cref="List"/> of hexadecimal bytes that represent the track chunk.</param>
         /// <param name="deltaTime">The time between the previous event and the current event.</param>
-        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="AbstractMessage"/> information and the number of bytes the meta event was.</returns>
+        /// <returns>A <see cref="TrackMetaEventInfo"/> containing <see cref="IMessage"/> information and the number of bytes the meta event was.</returns>
         private TrackMetaEventInfo ProcessTrackEvent(List<byte> trackChunk, int deltaTime)
         {
             string trackEventType = trackEventStatusDictionary[trackChunk[0]];
@@ -371,7 +371,7 @@ namespace uMIDI.IO
             }
 
             //public method for Unit testing
-            public List<AbstractMessage> TestProcessTrackChunk(List<byte> trackChunk)
+            public List<IMessage> TestProcessTrackChunk(List<byte> trackChunk)
             {
                 return instance.ProcessTrackChunk(trackChunk);
             }
