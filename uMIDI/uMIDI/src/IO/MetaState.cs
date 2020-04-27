@@ -9,11 +9,13 @@ namespace uMIDI.IO
         public int Subdivision { get; set; }
         public int BPM { get; set; }
         public KeySignature KeySignature { get; set; }
-        public MetaState(int beatsPerMeasure, int subdivision, int bpm)
+        public MetaState(int beatsPerMeasure, int subdivision, int bpm,
+            KeySignature key)
         {
             BeatsPerMeasure = beatsPerMeasure;
             Subdivision = subdivision;
             BPM = bpm;
+            KeySignature = key;
         }
     }
 }

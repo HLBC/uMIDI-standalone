@@ -10,14 +10,15 @@ namespace uMIDI.Common
     /// </summary>
     public class Note : IEquatable<Note>
     {
+        private byte _channel;
         public byte Channel
         {
-            get => Channel;
+            get => _channel;
             set
             {
                 if (value < 16 && value >= 0)
                 {
-                    Channel = value;
+                    _channel = value;
                 }
                 else
                 {
@@ -27,13 +28,14 @@ namespace uMIDI.Common
             }
         }
 
+        private byte _pitch;
         public byte Pitch {
-            get => Pitch;
+            get => _pitch;
             set
             {
                 if (value < 128 && value >= 0)
                 {
-                    Pitch = value;
+                    _pitch = value;
                 }
                 else
                 {
@@ -43,13 +45,14 @@ namespace uMIDI.Common
             }
         }
 
+        private byte _velocity;
         public byte Velocity {
-            get => Velocity;
+            get => _velocity;
             set
             {
                 if (value < 128 && value >= 0)
                 {
-                    Velocity = value;
+                    _velocity = value;
                 }
                 else
                 {
@@ -149,6 +152,12 @@ namespace uMIDI.Common
         {
             return Channel == other.Channel && Pitch == other.Pitch
                 && Velocity == other.Velocity;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("(Note {2} {0} ({1}) {3})",
+                Pitch, Name(), Channel, Velocity);
         }
     }
 
