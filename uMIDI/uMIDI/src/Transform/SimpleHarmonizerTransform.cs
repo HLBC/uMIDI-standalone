@@ -1,9 +1,9 @@
 ﻿using System;
-using uMIDI.Transform;
+using uMIDI.IO;
 
-namespace uMIDI.src.Transform
+namespace uMIDI.Transform
 {
-    public class SimpleHarmonizerTransform : ITransform
+    public class SimpleHarmonizerTransform
     {
         public SimpleHarmonizerTransform()
         {

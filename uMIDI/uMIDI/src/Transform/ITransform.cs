@@ -1,4 +1,6 @@
-﻿namespace uMIDI.Transform
+﻿using uMIDI.IO;
+
+namespace uMIDI.Transform
 {
     public interface ITransform
     {

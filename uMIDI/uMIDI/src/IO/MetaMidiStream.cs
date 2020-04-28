@@ -10,6 +10,9 @@ namespace uMIDI.IO
         public MetaState MetaState { get; private set; }
         public MidiStream MidiStream { get; }
         public List<ITransform> Transforms { get; set; }
+        public Dictionary<string, List<ITransform>> FileTransforms { get; set; }
+        private Dictionary<string, MidiFile> _files;
+
         public MidiClock Clock { get => MidiStream.State.Clock; }
 
         public MetaMidiStream()
@@ -17,6 +20,8 @@ namespace uMIDI.IO
             MetaState = new MetaState();
             MidiStream = new MidiStream();
             Transforms = new List<ITransform>();
+            _files = new Dictionary<string, MidiFile>();
+            FileTransforms = new Dictionary<string, List<ITransform>>();
         }
 
         public MetaMidiStream(int ticksPerBeat)
@@ -24,6 +29,8 @@ namespace uMIDI.IO
             MetaState = new MetaState();
             MidiStream = new MidiStream(ticksPerBeat);
             Transforms = new List<ITransform>();
+            _files = new Dictionary<string, MidiFile>();
+            FileTransforms = new Dictionary<string, List<ITransform>>();
         }
 
         public MetaMidiStream(int ticksPerBeat, int beatsPerMeasure,
@@ -32,6 +39,18 @@ namespace uMIDI.IO
             MetaState = new MetaState(beatsPerMeasure, subdivision, bpm, key);
             MidiStream = new MidiStream(ticksPerBeat);
             Transforms = new List<ITransform>();
+            _files = new Dictionary<string, MidiFile>();
+            FileTransforms = new Dictionary<string, List<ITransform>>();
+        }
+
+        public void addFile(string name, MidiFile file)
+        {
+            _files.Add(name, file);
+        }
+
+        public bool removeFile(string name)
+        {
+            return _files.Remove(name);
         }
 
         public void PushBuffer(IMessage[] messages)

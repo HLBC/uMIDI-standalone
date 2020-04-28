@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using uMIDI.Common;
 using uMIDI.IO;
+using uMIDI.Transform;
 
 namespace uMIDI
 {
     public class MidiFile
     {
-        public MetaMidiStream MetaStream { get; }
+        public MetaMidiStream MetaStream { get; set; }
         public int BufferSize { get; }
         public bool EndOfFile { get; private set; }
         public int MessageCount { get => _messages.Count; }
@@ -86,6 +87,12 @@ namespace uMIDI
             _playHead += bufferSize;
 
             MetaStream.PushBuffer(buffer);
+        }
+
+        public Region ToRegion()
+        {
+            return Region.Messages2Region(_messages.ToArray(),
+                MetaStream.MetaState);
         }
     }
 }

@@ -10,7 +10,7 @@ using uMIDI.IO;
 /// Abstractions on top of <see cref="uMIDI.Common"/> to make transformations
 /// more intuitive.
 /// </summary>
-namespace uMIDI.Transform
+namespace uMIDI.IO
 {
     /// <summary>
     /// A collection of <see cref="TimedNote"/>s, sorted by start time.
@@ -145,6 +145,20 @@ namespace uMIDI.Transform
             return (messages.ToArray(), region.State);
         }
 
+        public static Region combineRegions(IList<Region> regions,
+            MetaState metaState)
+        {
+            List<TimedNote> notesNotSorted = new List<TimedNote>();
+            foreach (Region region in regions)
+            {
+                notesNotSorted.AddRange(region._notes);
+            }
+            Region retVal = new Region(
+                notesNotSorted,
+                metaState);
+            return retVal;
+        }
+
         public void Add(TimedNote note)
         {
             int index = 0;
@@ -197,38 +211,6 @@ namespace uMIDI.Transform
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _notes.GetEnumerator();
-        }
-    }
-
-    /// <summary>
-    /// Abstraction upon <see cref="Note"/> which adds a start and end time
-    /// to a note.
-    /// </summary>
-    public class TimedNote : Note, IEquatable<TimedNote>
-    {
-        // Absolute start time of note. null value denotes note is already being
-        // played at instantiation.
-        public long? StartTime { get; set; }
-        // Absolute end time of note. null value denotes note is not released.
-        public long? EndTime { get; set; }
-
-        public TimedNote(byte channel, byte pitch, byte velocity,
-            long? startTime, long? endTime) : base(channel, pitch, velocity)
-        {
-            StartTime = startTime;
-            EndTime = endTime;
-        }
-
-        public bool Equals([AllowNull] TimedNote other)
-        {
-            return base.Equals(other) && StartTime == other.StartTime
-                && EndTime == other.EndTime;
-        }
-
-        public override string ToString()
-        {
-            return String.Format("(Note {2} {0} ({1}) {3} Start: {4} End: {5})",
-                Pitch, Name(), Channel, Velocity, StartTime, EndTime);
         }
     }
 }
